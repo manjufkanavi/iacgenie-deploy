@@ -1,2 +1,4 @@
 ---
-# Handlers for postgresql
+# PostgreSQL role - Handlers
+- name: Restart postgresql
+  ansible.builtin.command: docker compose -p iacgenie restart postgres

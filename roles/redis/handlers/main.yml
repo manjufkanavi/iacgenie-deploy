@@ -1,2 +1,4 @@
 ---
-# Handlers for redis
+# Redis role - Handlers
+- name: Restart redis
+  ansible.builtin.command: docker compose -p iacgenie restart redis

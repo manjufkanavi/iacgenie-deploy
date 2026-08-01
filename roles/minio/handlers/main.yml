@@ -1,2 +1,4 @@
 ---
-# Handlers for minio
+# MinIO role - Handlers
+- name: Restart minio
+  ansible.builtin.command: docker compose -p iacgenie restart minio

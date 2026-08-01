@@ -1,2 +1,4 @@
 ---
-# Handlers for openbao
+# OpenBao role - Handlers
+- name: Restart openbao
+  ansible.builtin.command: docker compose -p iacgenie restart openbao

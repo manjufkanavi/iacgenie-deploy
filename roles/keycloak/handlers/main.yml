@@ -1,2 +1,4 @@
 ---
-# Handlers for keycloak
+# Keycloak role - Handlers
+- name: Restart keycloak
+  ansible.builtin.command: docker compose -p iacgenie restart keycloak
