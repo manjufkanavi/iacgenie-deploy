@@ -44,19 +44,21 @@ Runs health checks against all running containers.
 
 ## Service Matrix
 
-| Service          | Image                        | Ports          | Status  |
-|------------------|------------------------------|----------------|---------|
-| PostgreSQL 15    | postgres:15-alpine           | 127.0.0.1:5432 | healthy |
-| Redis 7          | redis:7-alpine               | 127.0.0.1:6379 | healthy |
-| MinIO            | minio/minio:latest           | 127.0.0.1:9000 | healthy |
-| OpenBao 2.6.0    | openbao/openbao:2.6.0        | 127.0.0.1:8200 | healthy |
-| Keycloak 26.0    | quay.io/keycloak/keycloak:26.0 | 127.0.0.1:8080 | healthy |
-| Gitea 1.23.4     | gitea/gitea:1.23.4-rootless  | 127.0.0.1:3000 | healthy |
-| SearXNG          | searxng/searxng:latest       | 127.0.0.1:8080 | healthy |
-| NSQD             | nsqio/nsq:latest             | 127.0.0.1:4150 | healthy |
-| LightSerp API    | mkanavi/lightserp-api:latest | 127.0.0.1:8000 | healthy |
-| LightSerp WebUI  | mkanavi/lightserp-webui:latest | 127.0.0.1:3001 | healthy |
-| PageZen          | mkanavi/pagezen:latest       | 127.0.0.1:8081 | healthy |
+> **Last verified:** 2026-08-02
+
+| # | Service | Image | Port | Resources | Health Check |
+|---|---------|-------|------|-----------|-------------|
+| 1 | PostgreSQL 15 | `postgres:15-alpine` | `127.0.0.1:5432` | 1536 MB / 0.75 CPU | `pg_isready -U postgres` |
+| 2 | Redis 7 | `redis:7-alpine` | `127.0.0.1:6379` | 256 MB / 0.25 CPU | `redis-cli ping` |
+| 3 | MinIO | `minio/minio:latest` | `127.0.0.1:9000` (API), `:9001` (Console) | 512 MB / 0.5 CPU | `/minio/health/live` |
+| 4 | OpenBao 2.6.0 | `openbao/openbao:2.6.0` | `127.0.0.1:8200` | 512 MB / 0.5 CPU | `openbao status` (sealed=false) |
+| 5 | Keycloak 26.0 | `quay.io/keycloak/keycloak:26.0` | `127.0.0.1:8080` | 1024 MB / 0.5 CPU | port check |
+| 6 | Gitea 1.23.4 | `gitea/gitea:1.23.4-rootless` | `127.0.0.1:3000` (Web), `:2222`→222 (SSH) | 1024 MB / 0.5 CPU | `wget -qO- http://localhost:3000/` |
+| 7 | SearXNG | `searxng/searxng:latest` | `127.0.0.1:8081` | 512 MB / 0.5 CPU | `wget -qO- http://localhost:8081/` |
+| 8 | NSQD | `nsqio/nsq:latest` | `127.0.0.1:8071` (API), `:8072` (lookup) | 256 MB / 0.25 CPU | `wget -qO- http://localhost:8072/ping` |
+| 9 | LightSerp API | `mkanavi/lightserp-api:latest` | `127.0.0.1:3071` | 1024 MB / 1 CPU | port check `/health` |
+| 10 | LightSerp WebUI | `mkanavi/lightserp-webui:latest` | `127.0.0.1:3070` | 512 MB / 0.5 CPU | `hc_webui.js` |
+| 11 | PageZen | `mkanavi/pagezen:latest` | `127.0.0.1:8076` | 256 MB / 0.25 CPU | port check |
 
 ## Architecture
 
@@ -75,14 +77,28 @@ Runs health checks against all running containers.
 
 ## Ingress
 
-| Hostname                 | Service          | Nginx Port |
-|--------------------------|------------------|------------|
-| app.iacgenie.com         | LightSerp WebUI  | 3001       |
-| auth.iacgenie.com        | Keycloak         | 8080       |
-| git.iacgenie.com         | Gitea            | 3000       |
-| console.iacgenie.com     | MinIO            | 9001       |
-| vault.iacgenie.com       | OpenBao          | 8200       |
-| search.iacgenie.com      | SearXNG          | 8080       |
+### Nginx Reverse Proxy
+
+All services bound to `127.0.0.1` (loopback only). Nginx proxies external HTTPS traffic to internal ports.
+
+| Hostname                 | Service          | Nginx → Container Port |
+|--------------------------|------------------|------------------------|
+| `app.iacgenie.com`       | LightSerp WebUI  | → `127.0.0.1:3070`    |
+| `auth.iacgenie.com`      | Keycloak         | → `127.0.0.1:8080`    |
+| `git.iacgenie.com`       | Gitea            | → `127.0.0.1:3000`    |
+| `console.iacgenie.com`   | MinIO Console    | → `127.0.0.1:9001`    |
+| `vault.iacgenie.com`     | OpenBao          | → `127.0.0.1:8200`    |
+| `search.iacgenie.com`    | SearXNG          | → `127.0.0.1:8081`    |
+
+### Cloudflare Tunnel
+
+- **Service:** `cloudflared` (systemd)
+- **Config:** `/etc/cloudflared/config.yml`
+- **Purpose:** Exposes all `*.iacgenie.com` hostnames via Cloudflare Edge
+
+### DNS Records
+
+All hostnames use CNAME to `<account>.cfargotunnel.com` via Cloudflare Dashboard.
 
 ## Known Issues & Fixes
 
@@ -117,15 +133,63 @@ SearXNG requires `SEARXNG_SECRET` env var. Must be generated with: `python3 -c "
 
 ## Backup
 
-Backup playbook available via `playbooks/backup.yml`. Configured to backup:
-- PostgreSQL database (`lightsrp`)
-- MinIO buckets (`iacgenie-lightserp`)
-- Gitea repositories
-- OpenBao secret store
+### Automated Backups
+
+| Service | Script | Schedule | Retention | Location |
+|---------|--------|----------|-----------|----------|
+| OpenBao Raft | `/opt/backup/backup_openbao.py` | Every 6h | 30 days | `/opt/backup/` |
+| PostgreSQL | `playbooks/backup.yml --tags postgresql` | Daily 02:00 | 14 days | `/opt/backup/pg/` |
+| MinIO | `playbooks/backup.yml --tags minio` | Daily 03:00 | 7 days | `/opt/backup/minio/` |
+| Gitea repos | `playbooks/backup.yml --tags gitea` | Weekly Sun 04:00 | 4 weeks | `/opt/backup/gitea/` |
+
+### Manual Backup Commands
+
+```bash
+# OpenBao
+cd /opt/backup && python3 backup_openbao.py
+
+# PostgreSQL
+cd ~/projects/iacgenie-deploy && ansible-playbook playbooks/backup.yml --tags postgresql
+
+# MinIO
+mc mirror iacgenie/iacgenie-lightserp /opt/backup/minio/iacgenie-lightserp/
+
+# Gitea
+cd ~/projects/iacgenie-deploy && ansible-playbook playbooks/backup.yml --tags gitea
+```
+
+> **Full backup & restore procedures:** See [BACKUP.md](../BACKUP.md) in the unified infra repo.
 
 ## Docker Compose File
 
-Generated at `/home/mkanavi/iacgenie-unified-infra/docker-compose.yml` by the `docker-compose-generator` role. Do not edit manually.
+**Primary location:** `/home/mkanavi/docker/iacgenie/docker-compose-unified.yml`  
+**Generated by:** `docker-compose-generator` role (Ansible)  
+**Do not edit manually** — run `ansible-playbook playbooks/services.yml` to regenerate.
+
+### Docker Volume Paths
+
+| Volume | Mount Path |
+|--------|-----------|
+| `postgres_data` | `/home/mkanavi/docker/iacgenie/postgres_data` |
+| `redis_data` | `/home/mkanavi/docker/iacgenie/redis_data` |
+| `minio_data` | `/home/mkanavi/docker/iacgenie/minio_data` |
+| `openbao_data` | `/home/mkanavi/docker/iacgenie/openbao_data` |
+| `openbao_raft` | `/home/mkanavi/docker/iacgenie/openbao_raft` |
+| `gitea_data` | `/home/mkanavi/docker/iacgenie/gitea_data` |
+| `keycloak_data` | `/home/mkanavi/docker/iacgenie/keycloak_data` |
+
+### systemd Service
+
+```bash
+# Start all services
+sudo systemctl start lightserp
+
+# Check status
+sudo systemctl status lightserp
+
+# View logs
+sudo journalctl -u lightserp -f
+```
 
 ## Secrets
 
@@ -151,13 +215,31 @@ All secrets stored in OpenBao at `iacgenie/` path. Environment variables in `.en
 ## Troubleshooting
 
 ### Containers Exited After Docker Restart
-Run: `cd /home/mkanavi/iacgenie-unified-infra && docker compose up -d`
+
+```bash
+# Check systemd service (preferred)
+sudo systemctl restart lightserp
+
+# Or manual compose restart
+cd /home/mkanavi/docker/iacgenie && docker compose up -d
+```
 
 ### OpenBao Sealed
-Run: `docker exec iacgenie_openbao openbao unseal <key>` (3 of 5 keys required)
+
+```bash
+# Unseal (3 of 5 keys required — keys stored OFF-VM in password manager)
+docker exec iacgenie_openbao openbao unseal <key>
+docker exec iacgenie_openbao openbao unseal <key>
+docker exec iacgenie_openbao openbao unseal <key>
+
+# Verify
+docker exec iacgenie_openbao openbao status
+```
 
 ### LightSerp Build Failure
-LightSerp images are built locally from the LightSerp repo. Rebuild with:
+
+LightSerp images are built locally from the LightSerp repo:
+
 ```bash
 cd ~/LightSerp && docker compose build
 docker tag mkanavi/lightserp-api:latest mkanavi/lightserp-api:latest
@@ -166,4 +248,26 @@ docker tag mkanavi/pagezen:latest mkanavi/pagezen:latest
 ```
 
 ### Cloudflare Tunnel Inactive
-After DNS/cert changes: `sudo systemctl restart cloudflared`
+
+```bash
+sudo systemctl restart cloudflared
+sudo systemctl status cloudflared  # verify active
+```
+
+### Port Conflicts
+
+All services are bound to `127.0.0.1` only. If a host port is occupied:
+
+```bash
+# Find what's using the port
+sudo lsof -i :3071
+
+# Edit the generated compose file and change the host port
+# Then re-run: ansible-playbook playbooks/services.yml
+```
+
+### Nginx Config Reload
+
+```bash
+sudo nginx -t && sudo systemctl reload nginx
+```

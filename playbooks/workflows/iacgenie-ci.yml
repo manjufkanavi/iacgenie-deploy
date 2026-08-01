@@ -1,0 +1,52 @@
+---
+name: iacgenie CI (from unified-infra)
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Ansible Lint
+        uses: ansible/ansible-lint@main
+        with:
+          args: "-x yaml,-command-instead-of-shell"
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    needs: [lint]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Syntax Check All Playbooks
+        run: |
+          for pb in playbooks/*.yml; do
+            echo "Checking $pb..."
+            ansible-playbook --syntax-check "$pb"
+          done
+
+      - name: Inventory Check
+        run: |
+          ansible-inventory --list -i inventory/hosts.yml > /dev/null 2>&1
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    needs: [test]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Docker Compose Validate
+        uses: isworthless/docker-compose-validate@v1.0.13
+        with:
+          composefile: roles/docker-compose-generator/templates/docker-compose.yml.j2

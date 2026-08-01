@@ -1,0 +1,26 @@
+---
+name: unified-infra CI
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  lint:
+    name: Lint Infrastructure
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Ansible Lint
+        uses: ansible/ansible-lint@main
+
+      - name: Docker Compose Validate
+        uses: isworthless/docker-compose-validate@v1.0.13
+        with:
+          composefile: roles/docker-compose-generator/templates/docker-compose.yml.j2
+
+      - name: ShellCheck
+        uses: shrgr/actions-shellcheck@v2

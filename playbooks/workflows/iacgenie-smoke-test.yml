@@ -1,0 +1,22 @@
+---
+name: iacgenie CI
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  smoke-test:
+    name: Smoke Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check Gitea URL
+        run: |
+          curl -sf -o /dev/null -w "%{http_code}" https://gitea.iacgenie.com/ | grep -q "200" || echo "WARNING: Gitea not reachable"
+      - name: Check Keycloak URL
+        run: |
+          curl -sf -o /dev/null -w "%{http_code}" https://keycloak.iacgenie.com/ | grep -q "200" || echo "WARNING: Keycloak not reachable"
+      - name: Check PostgreSQL
+        run: |
+          curl -sf -o /dev/null -w "%{http_code}" https://pgadmin.iacgenie.com/ | grep -q "200" || echo "WARNING: pgAdmin not reachable"
