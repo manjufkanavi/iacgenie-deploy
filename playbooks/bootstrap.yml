@@ -13,5 +13,4 @@
   roles:
     - role: common
     - role: docker
-    - role: user_management
     - role: ntp_config

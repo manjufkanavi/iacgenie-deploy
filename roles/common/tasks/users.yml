@@ -32,6 +32,7 @@
     user: "{{ deploy_username | default('deploy') }}"
     key: "{{ item }}"
   loop: "{{ ssh_public_keys | default([]) }}"
+  when: item | length > 0 and not item.startswith('REPLACE_')
 
 - name: "Common | Add deploy user to docker group"
   ansible.builtin.user:

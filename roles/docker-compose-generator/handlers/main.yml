@@ -1,2 +1,14 @@
 ---
 # Handlers for docker-compose-generator
+
+- name: Reload docker compose
+  ansible.builtin.command: docker compose -p iacgenie up -d
+  changed_when: true
+
+- name: Wait for containers to be healthy
+  ansible.builtin.command: docker compose -p iacgenie ps --filter "status=running" --format json
+  register: _healthy_check
+  changed_when: false
+  retries: 12
+  delay: 5
+  until: _healthy_check is succeeded

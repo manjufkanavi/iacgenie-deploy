@@ -32,6 +32,7 @@
     user: "{{ deploy_username | default('deploy') }}"
     key: "{{ item }}"
   loop: "{{ ssh_public_keys | default([]) }}"
+  when: item | length > 0 and not item.startswith('REPLACE_')
 
 - name: "User Management | Verify user setup"
   ansible.builtin.debug:

@@ -23,6 +23,7 @@
     name: cloudflared
     state: started
     enabled: yes
+  when: ansible_facts.services is defined and (ansible_facts.services.get('cloudflared') is defined and ansible_facts.services.get('cloudflared').status != 'not-found')
 
 - name: "Cloudflare | Verify Cloudflare Tunnel is running"
   ansible.builtin.command: docker compose -p iacgenie ps cloudflared

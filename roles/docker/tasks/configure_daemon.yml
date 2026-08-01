@@ -14,11 +14,3 @@
     group: root
     mode: "0644"
   notify: Restart docker
-
-- name: "Docker | Ensure default address pools are configured"
-  ansible.builtin.lineinfile:
-    path: /etc/docker/daemon.json
-    regexp: '"default-address-pools"'
-    line: '  "default-address-pools": [{"base": "{{ docker_network_subnet }}", "size": 24}]'
-  notify: Restart docker
-  when: docker_network_subnet is defined
