@@ -93,7 +93,7 @@ services:
       OPENBAO_ADDR: http://127.0.0.1:8200
       OPENBAO_CLUSTER_ADDR: https://127.0.0.1:8201
       OPENBAO_UI: "true"
-      OPENBAO_STORAGE_TYPE: file
+      OPENBAO_STORAGE_TYPE: raft
       OPENBAO_STORAGE_PATH: /openbao/storage
       OPENBAO_LOG_LEVEL: info
     volumes:
@@ -211,7 +211,9 @@ services:
       MINIO_ACCESS_KEY: "${MINIO_ROOT_USER}"
       MINIO_SECRET_KEY: "${MINIO_ROOT_PASSWORD}"
       NSQD_ADDR: "nsqd:4150"
-      SearXNG_URL: "http://searxng:8080"
+      SEARXNG_URL: "http://searxng:8080"
+      LIGHTSERP_S3_BASE: "iacgenie-lightserp"
+      LIGHTSERP_ALLOW_INSECURE: "true"
     ports:
       - "127.0.0.1:8000:8000"
     networks:

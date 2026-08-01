@@ -38,7 +38,7 @@
         policy: "{{ item.policy }}"
       loop:
         - { direction: incoming, policy: deny }
-        - { direction: outgoing, policy: accept }
+        - { direction: outgoing, policy: allow }
 
     - name: "Common | Add UFW rules for allowed ports"
       community.general.ufw:

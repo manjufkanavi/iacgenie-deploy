@@ -32,3 +32,10 @@
     user: "{{ deploy_username | default('deploy') }}"
     key: "{{ item }}"
   loop: "{{ ssh_public_keys | default([]) }}"
+
+- name: "Common | Add deploy user to docker group"
+  ansible.builtin.user:
+    name: "{{ deploy_username | default('deploy') }}"
+    groups: docker
+    append: yes
+  when: deploy_username | default('deploy') != 'root'
