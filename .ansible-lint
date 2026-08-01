@@ -1,0 +1,20 @@
+---
+# .ansible-lint configuration
+profile: production
+
+skip_list:
+  - yaml[line-length]
+  - yaml[truthy]
+  - no-changed-when
+  - command-instead-of-module
+  - galaxy[no-changed-when]
+  - var-naming[variable-name]
+
+warn_list:
+  - experimental
+  - role-name
+
+ignore:
+  - .venv
+  - collections
+  - tests

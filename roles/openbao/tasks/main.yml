@@ -1,0 +1,5 @@
+---
+# Main tasks for openbao role
+- name: 'openbao - Placeholder task'
+  debug:
+    msg: 'openbao role not yet fully implemented'

@@ -1,0 +1,5 @@
+---
+# Main tasks for keycloak role
+- name: 'keycloak - Placeholder task'
+  debug:
+    msg: 'keycloak role not yet fully implemented'

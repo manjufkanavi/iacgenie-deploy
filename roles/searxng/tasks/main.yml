@@ -1,0 +1,5 @@
+---
+# Main tasks for searxng role
+- name: 'searxng - Placeholder task'
+  debug:
+    msg: 'searxng role not yet fully implemented'

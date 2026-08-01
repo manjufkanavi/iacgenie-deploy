@@ -1,0 +1,161 @@
+# inventory/group_vars/all.yml
+---
+# =====================
+# Common Variables
+# =====================
+timezone: UTC
+ntp_enabled: true
+hostname: vm.iacgenie.com
+
+# SSH settings
+ssh_port: 22
+ssh_password_authentication: "no"
+ssh_permit_root_login: "no"
+ssh_public_keys:
+  - "ssh-ed25519 REPLACE_WITH_ACTUAL_KEY"
+
+# =====================
+# Docker Settings
+# =====================
+docker_edition: ce
+docker_ce_version: "29.1"
+docker_compose_plugin_version: "2.29.0"
+docker_network_name: iacgenie-network
+docker_network_subnet: "172.28.0.0/16"
+docker_log_driver: json-file
+docker_log_max_size: "10m"
+docker_log_max_file: "3"
+
+# Docker daemon config
+docker_daemon_json:
+  log-driver: "{{ docker_log_driver }}"
+  log-opts:
+    max-size: "{{ docker_log_max_size }}"
+    max-file: "{{ docker_log_max_file }}"
+  storage-driver: overlay2
+  default-address-pools:
+    - base: "{{ docker_network_subnet }}"
+      size: 24
+
+# =====================
+# Service Memory Defaults
+# =====================
+service_memory_defaults:
+  postgres: "2g"
+  redis: "512m"
+  minio: "4g"
+  openbao: "1g"
+  keycloak: "2g"
+  gitea: "1g"
+  nginx: "512m"
+  cloudflared: "256m"
+  lightserp: "512m"
+  pagezen: "512m"
+
+# =====================
+# Backup Settings
+# =====================
+backup_enabled: true
+backup_retention_days: 30
+backup_schedule: "0 2 * * *"
+backup_dest: /mnt/backups
+rclone_remote: gdrive
+rclone_dest: iacgenie-backups
+
+# MinIO for backups
+minio_root_user: iacgenie
+minio_root_password: CHANGE_ME_IN_VAULT
+minio_api_url: http://127.0.0.1:9000
+minio_console_url: http://127.0.0.1:9001
+
+# PostgreSQL backup
+pgbackrest_repo_type: s3
+pgbackrest_repo_bucket: iacgenie-backups
+pgbackrest_repo_path: /pgbackups
+pgbackrest_retention_full: "4"
+pgbackrest_retention_diff: "7"
+
+# =====================
+# TLS/Certificates
+# =====================
+certbot_email: admin@iacgenie.com
+certbot_challenge: dns
+# For HTTP-01 challenge: certbot_challenge: http
+wildcard_domains:
+  - "*.iacgenie.com"
+  - iacgenie.com
+certbot_key_dir: /etc/letsencrypt
+certbot_certs_dir: /etc/letsencrypt/live
+
+# =====================
+# Cloudflare Tunnel
+# =====================
+cloudflared_version: "2025.6.0"
+cloudflared_metrics_port: 12345
+cloudflared_tunnel_name: iacgenie-tunnel
+
+# =====================
+# Nginx Settings
+# =====================
+nginx_worker_processes: auto
+nginx_worker_connections: 1024
+nginx_keepalive_timeout: 65
+nginx_client_max_body_size: "64m"
+nginx_rate_limit_zone: "10m"
+nginx_rate_limit_rate: "10r/s"
+
+# =====================
+# Security Settings
+# =====================
+ufw_enabled: true
+ufw_default_policy: deny
+ufw_allowed_ports:
+  - 22/tcp   # SSH
+  - 443/tcp  # HTTPS
+  - 80/tcp   # HTTP (redirect)
+fail2ban_enabled: true
+fail2ban_maxretry: 5
+fail2ban_bantime: 3600
+
+# =====================
+# Kubernetes / Docker Swarm
+# =====================
+# Single VM deployment - no swarm/k8s
+swarm_enabled: false
+k8s_enabled: false
+
+# =====================
+# Monitoring
+# =====================
+netdata_enabled: true
+prometheus_enabled: false
+grafana_enabled: false
+sentry_enabled: false
+
+# =====================
+# Network Ports (per-service)
+# =====================
+ports:
+  postgres: 5432
+  redis: 6379
+  minio_api: 9000
+  minio_console: 9001
+  openbao: 8200
+  keycloak: 8080
+  gitea_http: 3000
+  gitea_ssh: 2222
+  lightserp_api: 8000
+  lightserp_webui: 3001
+  searxng: 8080
+  nsqd: 4150
+  nsqadmin: 4151
+  pagezen: 8081
+  prometheus: 9090
+  grafana: 3000
+  cloudflared_metrics: 12345
+
+# =====================
+# Docker Image Registry
+# =====================
+docker_registry: docker.io
+docker_compose_project: iacgenie

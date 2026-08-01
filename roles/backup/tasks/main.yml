@@ -1,0 +1,5 @@
+---
+# Main tasks for backup role
+- name: 'backup - Placeholder task'
+  debug:
+    msg: 'backup role not yet fully implemented'

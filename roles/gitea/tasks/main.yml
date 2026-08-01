@@ -1,0 +1,5 @@
+---
+# Main tasks for gitea role
+- name: 'gitea - Placeholder task'
+  debug:
+    msg: 'gitea role not yet fully implemented'

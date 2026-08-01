@@ -1,0 +1,5 @@
+---
+# Main tasks for pagezen role
+- name: 'pagezen - Placeholder task'
+  debug:
+    msg: 'pagezen role not yet fully implemented'

@@ -1,0 +1,9 @@
+gitea_version: "1.23.4-rootless"
+gitea_http_port: 3000
+gitea_ssh_port: 2222
+gitea_admin_user: admin
+gitea_admin_password: CHANGE_ME_IN_VAULT
+gitea_admin_email: admin@iacgenie.com
+gitea_db_host: 127.0.0.1
+gitea_db_port: 5432
+gitea_db_name: gitea

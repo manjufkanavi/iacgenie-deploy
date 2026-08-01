@@ -1,0 +1,20 @@
+---
+# Services playbook: deploy all Docker services
+- hosts: all
+  become: true
+  become_method: sudo
+  
+  roles:
+    - role: docker-compose-generator
+    - role: postgresql
+    - role: redis
+    - role: minio
+    - role: openbao
+    - role: keycloak
+    - role: gitea
+    - role: lightserp
+    - role: searxng
+    - role: nsqd
+    - role: pagezen
+    - role: nginx
+    - role: cloudflare_tunnel

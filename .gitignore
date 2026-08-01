@@ -1,0 +1,15 @@
+# IacGenie Ansible Deployment - Git Ignore
+*.pyc
+__pycache__/
+.venv/
+.ansible/
+.env
+.vault_key
+secrets/vault.yml
+*.log
+*.swp
+*.swo
+*~
+.credential
+.cred
+host_key.pub

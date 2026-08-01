@@ -1,0 +1,5 @@
+---
+# Main tasks for nginx role
+- name: 'nginx - Placeholder task'
+  debug:
+    msg: 'nginx role not yet fully implemented'

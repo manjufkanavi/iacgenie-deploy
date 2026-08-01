@@ -1,0 +1,5 @@
+---
+# Main tasks for lightserp role
+- name: 'lightserp - Placeholder task'
+  debug:
+    msg: 'lightserp role not yet fully implemented'

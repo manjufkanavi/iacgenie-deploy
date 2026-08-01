@@ -1,0 +1,4 @@
+docker_network_name: iacgenie-network
+docker_network_subnet: "172.28.0.0/16"
+docker_compose_project: iacgenie
+generate_compose_files: true

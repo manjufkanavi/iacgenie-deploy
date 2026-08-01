@@ -1,0 +1,20 @@
+---
+# Docker Compose Generator - Generate compose file
+- name: "Compose Gen | Render docker-compose.yml template"
+  ansible.builtin.template:
+    src: docker-compose.yml.j2
+    dest: /home/mkanavi/iacgenie-unified-infra/docker-compose.yml
+    owner: mkanavi
+    group: mkanavi
+    mode: "0644"
+  notify: Reload docker compose
+  when: generate_compose_files | default(true) | bool
+
+- name: "Compose Gen | Verify compose file syntax"
+  ansible.builtin.command: docker compose -f /home/mkanavi/iacgenie-unified-infra/docker-compose.yml config --quiet
+  changed_when: false
+  register: compose_validate
+
+- name: "Compose Gen | Show compose file location"
+  ansible.builtin.debug:
+    msg: "docker-compose.yml deployed to /home/mkanavi/iacgenie-unified-infra/"

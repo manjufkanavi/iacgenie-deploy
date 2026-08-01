@@ -1,0 +1,5 @@
+---
+# Main tasks for nsqd role
+- name: 'nsqd - Placeholder task'
+  debug:
+    msg: 'nsqd role not yet fully implemented'

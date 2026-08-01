@@ -1,0 +1,7 @@
+---
+collections:
+  - name: ansible.builtin
+  - name: community.general
+  - name: community.docker
+  - name: ansible.posix
+  - name: ansible.netcommon

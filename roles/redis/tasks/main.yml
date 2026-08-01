@@ -1,0 +1,5 @@
+---
+# Main tasks for redis role
+- name: 'redis - Placeholder task'
+  debug:
+    msg: 'redis role not yet fully implemented'

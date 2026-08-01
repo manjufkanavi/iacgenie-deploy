@@ -1,0 +1,3 @@
+docker_edition: ce
+docker_ce_version: "29.1"
+docker_compose_plugin_version: "2.29.0"

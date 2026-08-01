@@ -1,0 +1,24 @@
+---
+# Docker role - Configure Docker daemon
+- name: "Docker | Create Docker daemon config directory"
+  ansible.builtin.file:
+    path: /etc/docker
+    state: directory
+    mode: "0755"
+
+- name: "Docker | Deploy Docker daemon configuration"
+  ansible.builtin.template:
+    src: daemon.json.j2
+    dest: /etc/docker/daemon.json
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart docker
+
+- name: "Docker | Ensure default address pools are configured"
+  ansible.builtin.lineinfile:
+    path: /etc/docker/daemon.json
+    regexp: '"default-address-pools"'
+    line: '  "default-address-pools": [{"base": "{{ docker_network_subnet }}", "size": 24}]'
+  notify: Restart docker
+  when: docker_network_subnet is defined

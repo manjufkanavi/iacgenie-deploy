@@ -1,0 +1,5 @@
+---
+# Main tasks for minio role
+- name: 'minio - Placeholder task'
+  debug:
+    msg: 'minio role not yet fully implemented'

@@ -1,0 +1,11 @@
+---
+# Docker Compose Generator - Network setup
+- name: "Compose Gen | Create Docker network"
+  community.docker.docker_network:
+    name: "{{ docker_network_name | default('iacgenie-network') }}"
+    driver: bridge
+    ipam_config:
+      - subnet: "{{ docker_network_subnet | default('172.28.0.0/16') }}"
+    state: present
+  tags:
+    - docker-network

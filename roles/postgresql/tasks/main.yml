@@ -1,0 +1,5 @@
+---
+# Main tasks for postgresql role
+- name: 'postgresql - Placeholder task'
+  debug:
+    msg: 'postgresql role not yet fully implemented'

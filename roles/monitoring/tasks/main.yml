@@ -1,0 +1,5 @@
+---
+# Main tasks for monitoring role
+- name: 'monitoring - Placeholder task'
+  debug:
+    msg: 'monitoring role not yet fully implemented'

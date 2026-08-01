@@ -1,0 +1,15 @@
+---
+# Docker role - Prerequisites
+- name: "Docker | Install Docker prerequisites"
+  ansible.builtin.apt:
+    name:
+      - apt-transport-https
+      - ca-certificates
+      - curl
+      - gnupg
+      - lsb-release
+      - software-properties-common
+      - python3-pip
+      - passwd
+    state: present
+    update_cache: yes
