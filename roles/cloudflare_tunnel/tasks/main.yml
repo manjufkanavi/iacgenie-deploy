@@ -1,5 +1,34 @@
 ---
-# Main tasks for cloudflare_tunnel role
-- name: 'cloudflare_tunnel - Placeholder task'
-  debug:
-    msg: 'cloudflare_tunnel role not yet fully implemented'
+# Cloudflare Tunnel role - Main entry point
+- name: "Cloudflare | Deploy Cloudflare Tunnel configuration"
+  ansible.builtin.template:
+    src: cloudflared.yaml.j2
+    dest: /etc/cloudflared/config.yml
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart cloudflared
+
+- name: "Cloudflare | Deploy Cloudflare Tunnel service file"
+  ansible.builtin.template:
+    src: cloudflared.service.j2
+    dest: /etc/systemd/system/cloudflared.service
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart cloudflared
+
+- name: "Cloudflare | Enable and start Cloudflare Tunnel service"
+  ansible.builtin.systemd:
+    name: cloudflared
+    state: started
+    enabled: yes
+
+- name: "Cloudflare | Verify Cloudflare Tunnel is running"
+  ansible.builtin.command: docker compose -p iacgenie ps cloudflared
+  register: cloudflared_status
+  changed_when: false
+
+- name: "Cloudflare | Show Cloudflare status"
+  ansible.builtin.debug:
+    var: cloudflared_status.stdout

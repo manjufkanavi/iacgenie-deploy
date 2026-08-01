@@ -1,2 +1,4 @@
 ---
-# Handlers for monitoring
+# Monitoring role - Handlers
+- name: Restart monitoring stack
+  ansible.builtin.command: docker compose -f docker-compose.monitoring.yml up -d

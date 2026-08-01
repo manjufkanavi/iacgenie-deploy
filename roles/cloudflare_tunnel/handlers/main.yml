@@ -1,2 +1,4 @@
 ---
-# Handlers for cloudflare_tunnel
+# Cloudflare Tunnel role - Handlers
+- name: Restart cloudflared
+  ansible.builtin.command: docker compose -p iacgenie restart cloudflared

@@ -1,0 +1,24 @@
+# Cloudflare Tunnel configuration
+# Managed by Ansible
+metrics: 0.0.0.0:{{ cloudflared_metrics_port | default(12345) }}
+no-autoupdate: true
+
+tunnels:
+  - name: {{ cloudflared_tunnel_name | default('iacgenie-tunnel') }}
+    credentials-file: /etc/cloudflared/{{ cloudflared_tunnel_name }}.json
+    gracePeriod: 30s
+
+    # Auto-create credentials
+    autoUpdateFrequency: 24h
+
+    # Edge routes
+    hostname: iacgenie.com
+    path: /
+    service: http://nginx:80
+
+    # Service rules for each domain
+    serviceRules:
+{% for domain in wildcard_domains | default(['auth.iacgenie.com', 'search.iacgenie.com', 'api.iacgenie.com', 'app.iacgenie.com', 'git.iacgenie.com', 'page.iacgenie.com']) %}
+      - hostname: {{ domain }}
+        service: http://{{ domain | split('.') | first }}:80
+{% endfor %}

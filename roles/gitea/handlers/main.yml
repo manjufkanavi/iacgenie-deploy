@@ -1,2 +1,4 @@
 ---
-# Handlers for gitea
+# Gitea role - Handlers
+- name: Restart gitea
+  ansible.builtin.command: docker compose -p iacgenie restart gitea

@@ -1,2 +1,4 @@
 ---
-# Handlers for pagezen
+# PageZen role - Handlers
+- name: Restart pagezen
+  ansible.builtin.command: docker compose -p iacgenie restart pagezen

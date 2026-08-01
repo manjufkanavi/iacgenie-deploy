@@ -1,2 +1,4 @@
 ---
-# Handlers for searxng
+# SearXNG role - Handlers
+- name: Restart searxng
+  ansible.builtin.command: docker compose -p iacgenie restart searxng

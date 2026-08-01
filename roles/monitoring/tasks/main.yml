@@ -1,5 +1,37 @@
 ---
-# Main tasks for monitoring role
-- name: 'monitoring - Placeholder task'
-  debug:
-    msg: 'monitoring role not yet fully implemented'
+# Monitoring role - Main entry point
+- name: "Monitoring | Deploy monitoring docker-compose"
+  ansible.builtin.template:
+    src: docker-compose.monitoring.yml.j2
+    dest: /home/mkanavi/iacgenie-unified-infra/docker-compose.monitoring.yml
+    owner: mkanavi
+    group: mkanavi
+    mode: "0644"
+  notify: Restart monitoring stack
+
+- name: "Monitoring | Deploy Prometheus configuration"
+  ansible.builtin.template:
+    src: prometheus.yml.j2
+    dest: /home/mkanavi/iacgenie-unified-infra/prometheus/prometheus.yml
+    owner: mkanavi
+    group: mkanavi
+    mode: "0644"
+  notify: Restart monitoring stack
+
+- name: "Monitoring | Deploy Grafana provisioning"
+  ansible.builtin.template:
+    src: grafana-datasource.yml.j2
+    dest: /home/mkanavi/iacgenie-unified-infra/grafana/provisioning/datasources/prometheus.yml
+    owner: mkanavi
+    group: mkanavi
+    mode: "0644"
+  notify: Restart monitoring stack
+
+- name: "Monitoring | Verify monitoring stack is running"
+  ansible.builtin.command: docker compose -f docker-compose.monitoring.yml ps
+  register: monitoring_status
+  changed_when: false
+
+- name: "Monitoring | Show monitoring status"
+  ansible.builtin.debug:
+    var: monitoring_status.stdout

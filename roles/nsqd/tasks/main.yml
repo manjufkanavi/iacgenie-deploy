@@ -1,5 +1,19 @@
 ---
-# Main tasks for nsqd role
-- name: 'nsqd - Placeholder task'
-  debug:
-    msg: 'nsqd role not yet fully implemented'
+# NSQD role - Main entry point
+- name: "NSQD | Deploy environment file"
+  ansible.builtin.template:
+    src: .env.j2
+    dest: /home/mkanavi/iacgenie-unified-infra/.env
+    owner: mkanavi
+    group: mkanavi
+    mode: "0600"
+  notify: Restart nsqd
+
+- name: "NSQD | Verify NSQD is running"
+  ansible.builtin.command: docker compose -p iacgenie ps nsqd
+  register: nsqd_status
+  changed_when: false
+
+- name: "NSQD | Show NSQD status"
+  ansible.builtin.debug:
+    var: nsqd_status.stdout

@@ -1,2 +1,4 @@
 ---
-# Handlers for nsqd
+# NSQD role - Handlers
+- name: Restart nsqd
+  ansible.builtin.command: docker compose -p iacgenie restart nsqd

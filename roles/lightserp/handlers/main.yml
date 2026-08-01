@@ -1,2 +1,6 @@
 ---
-# Handlers for lightserp
+# LightSerp role - Handlers
+- name: Restart lightserp-api
+  ansible.builtin.command: docker compose -p iacgenie restart lightserp-api
+- name: Restart lightserp-webui
+  ansible.builtin.command: docker compose -p iacgenie restart lightserp-webui

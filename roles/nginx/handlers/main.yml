@@ -1,2 +1,4 @@
 ---
-# Handlers for nginx
+# Nginx role - Handlers
+- name: Restart nginx
+  ansible.builtin.command: docker compose -p iacgenie restart nginx

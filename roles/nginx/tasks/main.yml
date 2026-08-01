@@ -1,5 +1,28 @@
 ---
-# Main tasks for nginx role
-- name: 'nginx - Placeholder task'
-  debug:
-    msg: 'nginx role not yet fully implemented'
+# Nginx role - Main entry point
+- name: "Nginx | Deploy Nginx configuration"
+  ansible.builtin.template:
+    src: nginx.conf.j2
+    dest: /etc/nginx/nginx.conf
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart nginx
+
+- name: "Nginx | Deploy reverse proxy configuration"
+  ansible.builtin.template:
+    src: reverse-proxy.conf.j2
+    dest: /etc/nginx/conf.d/iacgenie.conf
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart nginx
+
+- name: "Nginx | Verify Nginx is running"
+  ansible.builtin.command: docker compose -p iacgenie ps nginx
+  register: nginx_status
+  changed_when: false
+
+- name: "Nginx | Show Nginx status"
+  ansible.builtin.debug:
+    var: nginx_status.stdout

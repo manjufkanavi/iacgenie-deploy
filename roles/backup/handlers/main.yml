@@ -1,2 +1,4 @@
 ---
-# Handlers for backup
+# Backup role - Handlers
+- name: Run backup
+  ansible.builtin.command: bash /usr/local/bin/backup.sh

@@ -1,0 +1,114 @@
+# Nginx reverse proxy for IacGenie services
+# Managed by Ansible
+
+map $http_upgrade $connection_upgrade {
+    default upgrade;
+    '' close;
+}
+
+server {
+    listen 80;
+    server_name _;
+    return 301 https://$host$request_uri;
+}
+
+server {
+    listen 443 ssl http2;
+    server_name {{ wildcard_domains[0] | replace('*', 'auth') if wildcard_domains else 'auth.iacgenie.com' }};
+
+    ssl_certificate /etc/letsencrypt/live/{{ wildcard_domains[0] | replace('*', 'auth') }}/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/{{ wildcard_domains[0] | replace('*', 'auth') }}/privkey.pem;
+
+    location / {
+        proxy_pass http://keycloak:8080;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+
+# SearXNG
+server {
+    listen 443 ssl http2;
+    server_name {{ wildcard_domains[0] | replace('*', 'search') if wildcard_domains else 'search.iacgenie.com' }};
+
+    ssl_certificate /etc/letsencrypt/live/{{ wildcard_domains[0] | replace('*', 'search') }}/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/{{ wildcard_domains[0] | replace('*', 'search') }}/privkey.pem;
+
+    location / {
+        proxy_pass http://searxng:8080;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+
+# LightSerp API
+server {
+    listen 443 ssl http2;
+    server_name {{ wildcard_domains[0] | replace('*', 'api') if wildcard_domains else 'api.iacgenie.com' }};
+
+    ssl_certificate /etc/letsencrypt/live/{{ wildcard_domains[0] | replace('*', 'api') }}/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/{{ wildcard_domains[0] | replace('*', 'api') }}/privkey.pem;
+
+    location / {
+        proxy_pass http://lightserp-api:8000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+
+# LightSerp WebUI
+server {
+    listen 443 ssl http2;
+    server_name {{ wildcard_domains[0] | replace('*', 'app') if wildcard_domains else 'app.iacgenie.com' }};
+
+    ssl_certificate /etc/letsencrypt/live/{{ wildcard_domains[0] | replace('*', 'app') }}/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/{{ wildcard_domains[0] | replace('*', 'app') }}/privkey.pem;
+
+    location / {
+        proxy_pass http://lightserp-webui:3001;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+
+# Gitea
+server {
+    listen 443 ssl http2;
+    server_name {{ wildcard_domains[0] | replace('*', 'git') if wildcard_domains else 'git.iacgenie.com' }};
+
+    ssl_certificate /etc/letsencrypt/live/{{ wildcard_domains[0] | replace('*', 'git') }}/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/{{ wildcard_domains[0] | replace('*', 'git') }}/privkey.pem;
+
+    location / {
+        proxy_pass http://gitea:3000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+
+# PageZen
+server {
+    listen 443 ssl http2;
+    server_name {{ wildcard_domains[0] | replace('*', 'page') if wildcard_domains else 'page.iacgenie.com' }};
+
+    ssl_certificate /etc/letsencrypt/live/{{ wildcard_domains[0] | replace('*', 'page') }}/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/{{ wildcard_domains[0] | replace('*', 'page') }}/privkey.pem;
+
+    location / {
+        proxy_pass http://pagezen:8081;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
