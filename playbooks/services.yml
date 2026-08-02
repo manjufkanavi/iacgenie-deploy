@@ -18,3 +18,9 @@
     - role: docker-compose-generator
     - role: nginx
     - role: cloudflare_tunnel
+
+  # Post-deploy: wait for containers, unseal OpenBao, check readiness
+  tasks:
+    - import_tasks: roles/openbao/tasks/unseal.yml
+      when:
+        - not openbao_skip_unseal | default(false) | bool

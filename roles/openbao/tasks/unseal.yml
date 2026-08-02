@@ -22,7 +22,7 @@
 
 - name: "OpenBao | Read unseal keys from init_keys.json"
   ansible.builtin.slurp:
-    src: "{{ openbao_data_dir }}/raft/init_keys.json"
+    src: "{{ openbao_raft_data_dir | default('/home/mkanavi/docker/iacgenie/data/openbao_raft') }}/init_keys.json"
   register: openbao_keys_raw
   when:
     - openbao_health.stdout != 'healthy'

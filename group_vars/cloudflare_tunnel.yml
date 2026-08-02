@@ -1,0 +1,7 @@
+# Cloudflare Tunnel credentials
+# Encrypt with: ansible-vault encrypt group_vars/cloudflare_tunnel.yml
+# Generate token at: https://dash.cloudflare.com/profile/api-tokens
+# Token permissions: Zone.Zone > Read, Cloudflare Tunnel > Manage
+cloudflared_api_token: "CHANGE_ME_IN_VAULT"
+cloudflared_account_tag: "{{ lookup('env', 'CF_ACCOUNT_TAG') | default('') }}"
+cloudflared_tunnel_name: iacgenie-tunnel
