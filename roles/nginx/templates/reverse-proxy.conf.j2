@@ -21,9 +21,6 @@ server {
     return 301 https://$host$request_uri;
 }
 
-# Wildcard SSL certificate for all *.iacgenie.com domains
-set $ssl_cert_path /etc/letsencrypt/live/iacgenie.com;
-
 # Keycloak (auth)
 server {
     listen 443 ssl http2;
