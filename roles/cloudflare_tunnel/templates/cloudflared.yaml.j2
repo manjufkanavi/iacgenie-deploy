@@ -7,15 +7,15 @@ tunnels:
   - name: {{ cloudflared_tunnel_name | default('iacgenie-tunnel') }}
     credentials-file: /etc/cloudflared/{{ cloudflared_tunnel_name }}.json
     gracePeriod: 30s
-    autoUpdateFrequency: 24h
 
-    # Default route — catch-all
-    hostname: iacgenie.com
-    path: /
-    service: http://nginx:80
+# Edge routes (top-level ingress rules)
+ingress:
+  - hostname: {{ cloudflared_default_hostname | default('iacgenie.com') }}
+    path: {{ cloudflared_default_path | default('/') }}
+    service: {{ cloudflared_default_service | default('http://nginx:80') }}
 
-    # Service rules — maps each subdomain to the correct Docker service
-    serviceRules:
+# Service rules — maps each subdomain to the correct Docker service
+serviceRules:
 {% for domain, svc in cloudflared_services | default({
   'auth.iacgenie.com': 'http://keycloak:8080',
   'search.iacgenie.com': 'http://searxng:8080',
@@ -24,6 +24,6 @@ tunnels:
   'git.iacgenie.com': 'http://gitea:3000',
   'page.iacgenie.com': 'http://pagezen:8081'
 }) | items %}
-      - hostname: {{ domain }}
-        service: {{ svc }}
+  - hostname: {{ domain }}
+    service: {{ svc }}
 {% endfor %}

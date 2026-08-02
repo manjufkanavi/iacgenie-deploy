@@ -17,6 +17,17 @@
     mode: "0644"
   notify: Restart cloudflared
 
+- name: "Cloudflare | Check if tunnel credentials file exists"
+  ansible.builtin.stat:
+    path: /etc/cloudflared/{{ cloudflared_tunnel_name }}.json
+  register: cloudflared_creds
+  failed_when: false
+
+- name: "Cloudflare | Warn if tunnel credentials missing"
+  ansible.builtin.debug:
+    msg: "Cloudflare tunnel credentials file not found at /etc/cloudflared/{{ cloudflared_tunnel_name }}.json. Run 'cloudflared tunnel login && cloudflared tunnel create {{ cloudflared_tunnel_name }}' and place the JSON file before starting the tunnel service."
+  when: not cloudflared_creds.stat.exists
+
 - name: "Cloudflare | Deploy Cloudflare Tunnel service file"
   ansible.builtin.template:
     src: cloudflared.service.j2
