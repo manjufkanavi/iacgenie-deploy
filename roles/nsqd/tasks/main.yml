@@ -7,7 +7,7 @@
     owner: mkanavi
     group: mkanavi
     mode: "0600"
-  notify: Restart nsqd
+  notify: Reload docker compose
 
 - name: "NSQD | Verify NSQD container is running"
   ansible.builtin.command: docker ps -a --filter "name=iacgenie-nsqd" --format "{{ '{{.Names}}' }}"

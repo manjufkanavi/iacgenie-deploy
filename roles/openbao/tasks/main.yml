@@ -15,7 +15,7 @@
     owner: mkanavi
     group: mkanavi
     mode: "0600"
-  notify: Restart openbao
+  notify: Reload docker compose
 
 - name: "OpenBao | Verify OpenBao container is running"
   ansible.builtin.command: docker ps -a --filter "name=iacgenie-openbao" --format "{{ '{{.Names}}' }}"

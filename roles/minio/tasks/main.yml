@@ -15,7 +15,7 @@
     owner: mkanavi
     group: mkanavi
     mode: "0600"
-  notify: Restart minio
+  notify: Reload docker compose
 
 - name: "MinIO | Verify MinIO container is running"
   ansible.builtin.command: docker ps -a --filter "name=iacgenie-minio" --format "{{ '{{.Names}}' }}"

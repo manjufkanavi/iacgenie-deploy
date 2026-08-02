@@ -10,7 +10,7 @@
     owner: mkanavi
     group: mkanavi
     mode: "0600"
-  notify: Restart redis
+  notify: Reload docker compose
 
 - name: "Redis | Verify Redis container is running"
   ansible.builtin.command: docker ps -a --filter "name=iacgenie-redis" --format "{{ '{{.Names}}' }}"
