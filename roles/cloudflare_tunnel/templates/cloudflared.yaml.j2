@@ -7,18 +7,23 @@ tunnels:
   - name: {{ cloudflared_tunnel_name | default('iacgenie-tunnel') }}
     credentials-file: /etc/cloudflared/{{ cloudflared_tunnel_name }}.json
     gracePeriod: 30s
-
-    # Auto-create credentials
     autoUpdateFrequency: 24h
 
-    # Edge routes
+    # Default route — catch-all
     hostname: iacgenie.com
     path: /
     service: http://nginx:80
 
-    # Service rules for each domain
+    # Service rules — maps each subdomain to the correct Docker service
     serviceRules:
-{% for domain in wildcard_domains | default(['auth.iacgenie.com', 'search.iacgenie.com', 'api.iacgenie.com', 'app.iacgenie.com', 'git.iacgenie.com', 'page.iacgenie.com']) %}
+{% for domain, svc in cloudflared_services | default({
+  'auth.iacgenie.com': 'http://keycloak:8080',
+  'search.iacgenie.com': 'http://searxng:8080',
+  'api.iacgenie.com': 'http://lightserp-api:8000',
+  'app.iacgenie.com': 'http://lightserp-webui:3001',
+  'git.iacgenie.com': 'http://gitea:3000',
+  'page.iacgenie.com': 'http://pagezen:8081'
+}) | items %}
       - hostname: {{ domain }}
-        service: http://{{ domain | split('.') | first }}:80
+        service: {{ svc }}
 {% endfor %}

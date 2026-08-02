@@ -1,6 +1,6 @@
 ---
 # Handlers for docker-compose-generator
-# Note: Path changed from /home/mkanavi/iacgenie-unified-infra/ to /home/mkanavi/docker/iacgenie/
+# Note: Path changed from /home/mkanavi/docker/iacgenie/ to /home/mkanavi/docker/iacgenie/
 
 - name: Reload docker compose
   ansible.builtin.command: docker compose -f /home/mkanavi/docker/iacgenie/docker-compose.yml -p iacgenie up -d

@@ -26,10 +26,11 @@
     mode: "0644"
   notify: Restart cloudflared
 
-- name: "Cloudflare | Ensure cloudflared binary exists"
+- name: "Cloudflare | Check if cloudflared binary exists"
   ansible.builtin.stat:
     path: /usr/bin/cloudflared
   register: cloudflared_binary
+  failed_when: false
 
 - name: "Cloudflare | Install cloudflared"
   block:
@@ -38,7 +39,9 @@
         url: "https://github.com/cloudflare/cloudflared/releases/download/{{ cloudflared_version | default('2025.6.0') }}/cloudflared-linux-amd64"
         dest: /tmp/cloudflared
         mode: "0755"
-      when: ansible_architecture == "x86_64"
+      when:
+        - ansible_architecture == "x86_64"
+        - cloudflared_binary.stat.exists | default(false) == false
 
     - name: Install cloudflared binary
       ansible.builtin.copy:
@@ -46,10 +49,18 @@
         dest: /usr/bin/cloudflared
         mode: "0755"
         remote_src: yes
+      when:
+        - ansible_architecture == "x86_64"
+        - cloudflared_binary.stat.exists | default(false) == false
+      notify: Restart cloudflared
 
     - name: Reload systemd daemon
       ansible.builtin.systemd:
         daemon_reload: yes
+
+  when:
+    - ansible_architecture == "x86_64"
+    - not ansible_check_mode | bool
 
 - name: "Cloudflare | Enable and start Cloudflare Tunnel service"
   ansible.builtin.systemd:

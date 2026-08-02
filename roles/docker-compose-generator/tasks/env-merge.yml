@@ -1,6 +1,6 @@
 ---
 # Docker Compose Generator - Merge individual .env.<service> files into unified .env
-# Note: Path changed from /home/mkanavi/iacgenie-unified-infra/ to /home/mkanavi/docker/iacgenie/
+# Note: Path changed from /home/mkanavi/docker/iacgenie/ to /home/mkanavi/docker/iacgenie/
 
 - name: "Compose Gen | Merge .env.* files into unified .env"
   ansible.builtin.shell: |

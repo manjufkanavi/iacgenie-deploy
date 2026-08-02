@@ -67,7 +67,7 @@ rclone_dest: iacgenie-backups
 
 # MinIO for backups
 minio_root_user: iacgenie
-minio_root_password: CHANGE_ME_IN_VAULT
+minio_root_password: ELI9TBbFPc#SRkmKvebN#yG3
 minio_api_url: http://127.0.0.1:9000
 minio_console_url: http://127.0.0.1:9001
 
@@ -155,3 +155,20 @@ ports:
 # =====================
 docker_registry: docker.io
 docker_compose_project: iacgenie
+
+# =====================
+# Service Secrets (from .env.pi.bak / production)
+# =====================
+pg_root_password: IsywG5y@ASmmElFSUEvInU9K
+keycloak_admin_password: hAaIa219fq5VzAP81SDyNuBV
+keycloak_db_password: CeeLLTVz@2I9O3NYGH!1CYN4
+gitea_admin_password: n00B6pZzd2JM3LM03frIjTsE
+gitea_db_password: Z4#w9dB!yuDgFXpRe#EmoR8k
+openbao_root_token: lWc7LtdRXxXtSt0szYDY#JE9
+lightserp_api_secret: VLpShZuWVyJwyZG2LIK4qzQS
+redis_password: OPuRwYP!JXyaKK9QKI#nLdfX
+searxng_secret: k2x1wApzlXrmVSO6Q6w#SCGO
+smtp_addr: mail.smtp2go.com
+smtp_port: "2525"
+smtp_user: CHANGE_ME_IN_VAULT
+smtp_from: noreply@iacgenie.com

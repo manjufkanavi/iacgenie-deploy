@@ -3,7 +3,7 @@
 - name: "Monitoring | Deploy monitoring docker-compose"
   ansible.builtin.template:
     src: docker-compose.monitoring.yml.j2
-    dest: /home/mkanavi/iacgenie-unified-infra/docker-compose.monitoring.yml
+    dest: /home/mkanavi/docker/iacgenie/docker-compose.monitoring.yml
     owner: mkanavi
     group: mkanavi
     mode: "0644"
@@ -12,7 +12,7 @@
 - name: "Monitoring | Deploy Prometheus configuration"
   ansible.builtin.template:
     src: prometheus.yml.j2
-    dest: /home/mkanavi/iacgenie-unified-infra/prometheus/prometheus.yml
+    dest: /home/mkanavi/docker/iacgenie/prometheus/prometheus.yml
     owner: mkanavi
     group: mkanavi
     mode: "0644"
@@ -21,7 +21,7 @@
 - name: "Monitoring | Deploy Grafana provisioning"
   ansible.builtin.template:
     src: grafana-datasource.yml.j2
-    dest: /home/mkanavi/iacgenie-unified-infra/grafana/provisioning/datasources/prometheus.yml
+    dest: /home/mkanavi/docker/iacgenie/grafana/provisioning/datasources/prometheus.yml
     owner: mkanavi
     group: mkanavi
     mode: "0644"

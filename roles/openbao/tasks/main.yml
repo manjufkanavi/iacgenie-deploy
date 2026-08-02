@@ -11,7 +11,7 @@
 - name: "OpenBao | Deploy environment file"
   ansible.builtin.template:
     src: .env.j2
-    dest: /home/mkanavi/iacgenie-unified-infra/.env.openbao
+    dest: /home/mkanavi/docker/iacgenie/.env.openbao
     owner: mkanavi
     group: mkanavi
     mode: "0600"

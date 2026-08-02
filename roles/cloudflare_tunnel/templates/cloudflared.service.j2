@@ -5,7 +5,6 @@ Wants=network-online.target
 
 [Service]
 Type=simple
-ExecStart=/usr/bin/cloudflared service uninstall
 ExecStart=/usr/bin/cloudflared --config /etc/cloudflared/config.yml tunnel --no-autoupdate run
 Restart=on-failure
 RestartSec=5
