@@ -1,25 +1,96 @@
 # Nginx reverse proxy for IacGenie services
-# Managed by Ansible
+# Managed by Ansible — production hardened with security headers
+# Merged from: reverse-proxy.conf.j2 + nginx-unified.conf
 
 map $http_upgrade $connection_upgrade {
     default upgrade;
     '' close;
 }
 
+# Rate limiting zones
+limit_req_zone $binary_remote_addr zone=general:10m rate=10r/s;
+limit_req_zone $binary_remote_addr zone=auth:10m rate=3r/m;
+limit_req_zone $binary_remote_addr zone=api:10m rate=30r/s;
+
+# HTTP → HTTPS redirect
 server {
     listen 80;
     server_name _;
     return 301 https://$host$request_uri;
 }
 
+{% for domain in wildcard_domains | default(['auth.iacgenie.com', 'search.iacgenie.com', 'api.iacgenie.com', 'app.iacgenie.com', 'git.iacgenie.com', 'page.iacgenie.com']) %}
+server {
+    listen 443 ssl http2;
+    server_name {{ domain }};
+
+    ssl_certificate /etc/letsencrypt/live/{{ domain.split('.')[0] }}/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/{{ domain.split('.')[0] }}/privkey.pem;
+
+    ssl_protocols       TLSv1.2 TLSv1.3;
+    ssl_ciphers         ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384;
+    ssl_prefer_server_ciphers on;
+    ssl_session_cache   shared:SSL:10m;
+    ssl_session_timeout 1d;
+    ssl_session_tickets off;
+
+    # Security headers
+    add_header Strict-Transport-Security "max-age=63072000; includeSubDomains; preload" always;
+    add_header X-Frame-Options "SAMEORIGIN" always;
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header X-XSS-Protection "1; mode=block" always;
+    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+
+    client_max_body_size {{ nginx_client_max_body_size | default('64m') }};
+
+    location / {
+        proxy_pass http://{{ domain.split('.')[0] }}:8080;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Forwarded-Port 443;
+        proxy_hide_header X-Powered-By;
+    }
+{% endfor %}
+
+# Keycloak (auth) — restricted to general zone
 server {
     listen 443 ssl http2;
     server_name {{ wildcard_domains[0] | replace('*', 'auth') if wildcard_domains else 'auth.iacgenie.com' }};
 
-    ssl_certificate /etc/letsencrypt/live/{{ wildcard_domains[0] | replace('*', 'auth') }}/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/{{ wildcard_domains[0] | replace('*', 'auth') }}/privkey.pem;
+    ssl_certificate /etc/letsencrypt/live/auth/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/auth/privkey.pem;
+
+    ssl_protocols       TLSv1.2 TLSv1.3;
+    ssl_ciphers         ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384;
+    ssl_prefer_server_ciphers on;
+    ssl_session_cache   shared:SSL:10m;
+    ssl_session_timeout 1d;
+    ssl_session_tickets off;
+
+    add_header Strict-Transport-Security "max-age=63072000; includeSubDomains; preload" always;
+    add_header X-Frame-Options "SAMEORIGIN" always;
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header X-XSS-Protection "1; mode=block" always;
+    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+
+    limit_req zone=auth burst=5 nodelay;
 
     location / {
+        proxy_pass http://keycloak:8080;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_read_timeout 86400;
+        proxy_hide_header X-Powered-By;
+    }
+
+    location /login* {
+        limit_req zone=auth burst=3 nodelay;
         proxy_pass http://keycloak:8080;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
@@ -28,13 +99,28 @@ server {
     }
 }
 
-# SearXNG
+# SearXNG (search)
 server {
     listen 443 ssl http2;
     server_name {{ wildcard_domains[0] | replace('*', 'search') if wildcard_domains else 'search.iacgenie.com' }};
 
-    ssl_certificate /etc/letsencrypt/live/{{ wildcard_domains[0] | replace('*', 'search') }}/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/{{ wildcard_domains[0] | replace('*', 'search') }}/privkey.pem;
+    ssl_certificate /etc/letsencrypt/live/search/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/search/privkey.pem;
+
+    ssl_protocols       TLSv1.2 TLSv1.3;
+    ssl_ciphers         ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384;
+    ssl_prefer_server_ciphers on;
+    ssl_session_cache   shared:SSL:10m;
+    ssl_session_timeout 1d;
+    ssl_session_tickets off;
+
+    add_header Strict-Transport-Security "max-age=63072000; includeSubDomains; preload" always;
+    add_header X-Frame-Options "SAMEORIGIN" always;
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header X-XSS-Protection "1; mode=block" always;
+    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+
+    limit_req zone=api burst=30 nodelay;
 
     location / {
         proxy_pass http://searxng:8080;
@@ -42,16 +128,32 @@ server {
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_hide_header X-Powered-By;
     }
 }
 
-# LightSerp API
+# LightSerp API (api)
 server {
     listen 443 ssl http2;
     server_name {{ wildcard_domains[0] | replace('*', 'api') if wildcard_domains else 'api.iacgenie.com' }};
 
-    ssl_certificate /etc/letsencrypt/live/{{ wildcard_domains[0] | replace('*', 'api') }}/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/{{ wildcard_domains[0] | replace('*', 'api') }}/privkey.pem;
+    ssl_certificate /etc/letsencrypt/live/api/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/api/privkey.pem;
+
+    ssl_protocols       TLSv1.2 TLSv1.3;
+    ssl_ciphers         ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384;
+    ssl_prefer_server_ciphers on;
+    ssl_session_cache   shared:SSL:10m;
+    ssl_session_timeout 1d;
+    ssl_session_tickets off;
+
+    add_header Strict-Transport-Security "max-age=63072000; includeSubDomains; preload" always;
+    add_header X-Frame-Options "SAMEORIGIN" always;
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header X-XSS-Protection "1; mode=block" always;
+    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+
+    limit_req zone=api burst=30 nodelay;
 
     location / {
         proxy_pass http://lightserp-api:8000;
@@ -59,16 +161,35 @@ server {
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_read_timeout 300;
+        proxy_hide_header X-Powered-By;
     }
 }
 
-# LightSerp WebUI
+# LightSerp WebUI (app)
 server {
     listen 443 ssl http2;
     server_name {{ wildcard_domains[0] | replace('*', 'app') if wildcard_domains else 'app.iacgenie.com' }};
 
-    ssl_certificate /etc/letsencrypt/live/{{ wildcard_domains[0] | replace('*', 'app') }}/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/{{ wildcard_domains[0] | replace('*', 'app') }}/privkey.pem;
+    ssl_certificate /etc/letsencrypt/live/app/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/app/privkey.pem;
+
+    ssl_protocols       TLSv1.2 TLSv1.3;
+    ssl_ciphers         ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384;
+    ssl_prefer_server_ciphers on;
+    ssl_session_cache   shared:SSL:10m;
+    ssl_session_timeout 1d;
+    ssl_session_tickets off;
+
+    add_header Strict-Transport-Security "max-age=63072000; includeSubDomains; preload" always;
+    add_header X-Frame-Options "SAMEORIGIN" always;
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header X-XSS-Protection "1; mode=block" always;
+    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+
+    limit_req zone=general burst=20 nodelay;
 
     location / {
         proxy_pass http://lightserp-webui:3001;
@@ -76,16 +197,35 @@ server {
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_read_timeout 300;
+        proxy_hide_header X-Powered-By;
     }
 }
 
-# Gitea
+# Gitea (git)
 server {
     listen 443 ssl http2;
     server_name {{ wildcard_domains[0] | replace('*', 'git') if wildcard_domains else 'git.iacgenie.com' }};
 
-    ssl_certificate /etc/letsencrypt/live/{{ wildcard_domains[0] | replace('*', 'git') }}/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/{{ wildcard_domains[0] | replace('*', 'git') }}/privkey.pem;
+    ssl_certificate /etc/letsencrypt/live/git/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/git/privkey.pem;
+
+    ssl_protocols       TLSv1.2 TLSv1.3;
+    ssl_ciphers         ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384;
+    ssl_prefer_server_ciphers on;
+    ssl_session_cache   shared:SSL:10m;
+    ssl_session_timeout 1d;
+    ssl_session_tickets off;
+
+    add_header Strict-Transport-Security "max-age=63072000; includeSubDomains; preload" always;
+    add_header X-Frame-Options "SAMEORIGIN" always;
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header X-XSS-Protection "1; mode=block" always;
+    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+
+    limit_req zone=general burst=20 nodelay;
 
     location / {
         proxy_pass http://gitea:3000;
@@ -93,16 +233,32 @@ server {
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_hide_header X-Powered-By;
     }
 }
 
-# PageZen
+# PageZen (page)
 server {
     listen 443 ssl http2;
     server_name {{ wildcard_domains[0] | replace('*', 'page') if wildcard_domains else 'page.iacgenie.com' }};
 
-    ssl_certificate /etc/letsencrypt/live/{{ wildcard_domains[0] | replace('*', 'page') }}/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/{{ wildcard_domains[0] | replace('*', 'page') }}/privkey.pem;
+    ssl_certificate /etc/letsencrypt/live/page/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/page/privkey.pem;
+
+    ssl_protocols       TLSv1.2 TLSv1.3;
+    ssl_ciphers         ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384;
+    ssl_prefer_server_ciphers on;
+    ssl_session_cache   shared:SSL:10m;
+    ssl_session_timeout 1d;
+    ssl_session_tickets off;
+
+    add_header Strict-Transport-Security "max-age=63072000; includeSubDomains; preload" always;
+    add_header X-Frame-Options "SAMEORIGIN" always;
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header X-XSS-Protection "1; mode=block" always;
+    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+
+    limit_req zone=general burst=20 nodelay;
 
     location / {
         proxy_pass http://pagezen:8081;
@@ -110,5 +266,6 @@ server {
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_hide_header X-Powered-By;
     }
 }

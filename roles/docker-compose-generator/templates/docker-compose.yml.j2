@@ -55,10 +55,10 @@ services:
           memory: "{{ service_memory_defaults.redis }}"
 
   # =====================
-  # MinIO
+  # MinIO (pinned for reproducibility)
   # =====================
   minio:
-    image: minio/minio:latest
+    image: minio/minio:RELEASE.2025-07-21T15-44-58Z
     container_name: iacgenie_minio
     restart: unless-stopped
     command: server /data --console-address ":9001"
@@ -247,10 +247,10 @@ services:
           memory: "{{ service_memory_defaults.lightserp }}"
 
   # =====================
-  # SearXNG
+  # SearXNG (pinned for reproducibility)
   # =====================
   searxng:
-    image: searxng/searxng:latest
+    image: searxng/searxng:1.0.0
     container_name: iacgenie_searxng
     restart: unless-stopped
     environment:
@@ -266,10 +266,10 @@ services:
           memory: "512m"
 
   # =====================
-  # NSQD
+  # NSQD (pinned for reproducibility)
   # =====================
   nsqd:
-    image: nsqio/nsq:latest
+    image: nsqio/nsq:v1.3.0
     container_name: iacgenie_nsqd
     restart: unless-stopped
     command: nsqd --tcp-address=0.0.0.0 --http-address=0.0.0.0 --data-path=/nsq/data

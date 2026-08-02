@@ -1,6 +1,11 @@
 ---
 # Nginx role - Main entry point
-- name: "Nginx | Deploy Nginx configuration"
+- name: "Nginx | Ensure Nginx is installed"
+  ansible.builtin.apt:
+    name: nginx
+    state: present
+
+- name: "Nginx | Deploy Nginx main configuration"
   ansible.builtin.template:
     src: nginx.conf.j2
     dest: /etc/nginx/nginx.conf
@@ -9,7 +14,7 @@
     mode: "0644"
   notify: Restart nginx
 
-- name: "Nginx | Deploy reverse proxy configuration"
+- name: "Nginx | Deploy reverse proxy configuration (unified)"
   ansible.builtin.template:
     src: reverse-proxy.conf.j2
     dest: /etc/nginx/conf.d/iacgenie.conf
@@ -18,11 +23,23 @@
     mode: "0644"
   notify: Restart nginx
 
-- name: "Nginx | Verify Nginx is running"
-  ansible.builtin.command: docker compose -p iacgenie ps nginx
-  register: nginx_status
-  changed_when: false
+- name: "Nginx | Remove stale unified config files"
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - /etc/nginx/conf.d/iacgenie-unified.conf
+    - /etc/nginx/conf.d/iacgenie-unified.conf.bak
+    - /etc/nginx/conf.d/iacgenie-unified.conf.bak.*
+  notify: Restart nginx
 
-- name: "Nginx | Show Nginx status"
-  ansible.builtin.debug:
-    var: nginx_status.stdout
+- name: "Nginx | Test configuration"
+  ansible.builtin.command: nginx -t
+  changed_when: false
+  failed_when: false
+
+- name: "Nginx | Ensure Nginx is running"
+  ansible.builtin.service:
+    name: nginx
+    state: started
+    enabled: yes
