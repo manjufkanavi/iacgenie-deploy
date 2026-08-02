@@ -1,5 +1,6 @@
 ---
 # Gitea role - Main entry point
+# Note: Container deployment is handled by docker-compose-generator role
 - name: "Gitea | Create data directory"
   ansible.builtin.file:
     path: "{{ gitea_data_dir | default('/home/mkanavi/docker/iacgenie/gitea_data/data') }}"
@@ -15,14 +16,6 @@
     group: "1000"
     mode: "0755"
     state: directory
-
-- name: "Gitea | Deploy Gitea Docker service definition"
-  ansible.builtin.template:
-    src: gitea-docker-service.yml.j2
-    dest: /tmp/gitea-docker-service.yml
-    owner: root
-    group: root
-    mode: "0644"
 
 - name: "Gitea | Verify Gitea container is running"
   ansible.builtin.command: docker ps -a --filter "name=iacgenie-gitea" --format "{{ '{{.Names}}' }}"
