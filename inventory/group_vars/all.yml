@@ -15,7 +15,7 @@ ssh_password_authentication: "no"
 ssh_permit_root_login: "no"
 # Replace placeholder before first run. Guarded by when: not item.startswith('REPLACE_')
 ssh_public_keys:
-  - "REPLACE_WITH_ACTUAL_SSH_PUBLIC_KEY"
+  - "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICOV/RQXqEu75KF6gTQSnlxFxD17QJaxzDUSupfA0qXN newvm"
 
 # =====================
 # Docker Settings

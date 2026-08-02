@@ -1,4 +1,4 @@
 ---
-# PageZen role - Handlers
-- name: Restart pagezen
-  ansible.builtin.command: docker compose -p iacgenie restart pagezen
+- name: "No-op: restart pagezen (use docker-compose-generator reload instead)"
+  ansible.builtin.debug:
+    msg: "Container restart handled by docker-compose-generator. No separate restart needed."

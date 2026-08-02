@@ -1,4 +1,4 @@
 ---
-# NSQD role - Handlers
-- name: Restart nsqd
-  ansible.builtin.command: docker compose -p iacgenie restart nsqd
+- name: "No-op: restart nsqd (use docker-compose-generator reload instead)"
+  ansible.builtin.debug:
+    msg: "Container restart handled by docker-compose-generator. No separate restart needed."

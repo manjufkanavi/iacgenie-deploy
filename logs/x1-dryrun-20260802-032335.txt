@@ -1,0 +1,3044 @@
+[WARNING]: Deprecation warnings can be disabled by setting `deprecation_warnings=False` in ansible.cfg.
+[DEPRECATION WARNING]: community.general.yaml has been deprecated. The plugin has been superseded by the option `result_format=yaml` in callback plugin ansible.builtin.default from ansible-core 2.13 onwards. This feature will be removed from collection 'community.general' version 12.0.0.
+Using /Users/manjunathkanavi/projects/iacgenie-deploy/ansible.cfg as config file
+
+PLAY [all] *********************************************************************
+
+TASK [Gathering Facts] *********************************************************
+ok: [iacgenie-server]
+
+TASK [Update apt cache] ********************************************************
+changed: [iacgenie-server] => changed=true 
+  cache_update_time: 1785580818
+  cache_updated: true
+
+TASK [common : Common | Update apt cache] **************************************
+changed: [iacgenie-server] => changed=true 
+  cache_update_time: 1785580818
+  cache_updated: true
+
+TASK [common : Common | Install common packages] *******************************
+ok: [iacgenie-server] => changed=false 
+  cache_update_time: 1785580818
+  cache_updated: false
+
+TASK [common : Common | Install fail2ban if enabled] ***************************
+ok: [iacgenie-server] => changed=false 
+  cache_update_time: 1785580818
+  cache_updated: false
+
+TASK [common : Common | Install ufw if enabled] ********************************
+ok: [iacgenie-server] => changed=false 
+  cache_update_time: 1785580818
+  cache_updated: false
+
+TASK [common : Common | Set timezone] ******************************************
+[WARNING]: Callback dispatch 'v2_on_file_diff' failed for plugin 'ansible_collections.community.general.plugins.callback.yaml': name 'AnsibleDumper' is not defined
+changed: [iacgenie-server] => changed=true
+
+TASK [common : Common | Configure SSH hardening] *******************************
+ok: [iacgenie-server] => (item={'regexp': '^#?Port .+', 'line': 'Port 22'}) => changed=false 
+  ansible_loop_var: item
+  backup: ''
+  item:
+    line: Port 22
+    regexp: ^#?Port .+
+  msg: ''
+ok: [iacgenie-server] => (item={'regexp': '^#?PermitRootLogin .+', 'line': 'PermitRootLogin no'}) => changed=false 
+  ansible_loop_var: item
+  backup: ''
+  item:
+    line: PermitRootLogin no
+    regexp: ^#?PermitRootLogin .+
+  msg: ''
+ok: [iacgenie-server] => (item={'regexp': '^#?PasswordAuthentication .+', 'line': 'PasswordAuthentication no'}) => changed=false 
+  ansible_loop_var: item
+  backup: ''
+  item:
+    line: PasswordAuthentication no
+    regexp: ^#?PasswordAuthentication .+
+  msg: ''
+ok: [iacgenie-server] => (item={'regexp': '^#?X11Forwarding .+', 'line': 'X11Forwarding no'}) => changed=false 
+  ansible_loop_var: item
+  backup: ''
+  item:
+    line: X11Forwarding no
+    regexp: ^#?X11Forwarding .+
+  msg: ''
+ok: [iacgenie-server] => (item={'regexp': '^#?MaxAuthTries .+', 'line': 'MaxAuthTries 3'}) => changed=false 
+  ansible_loop_var: item
+  backup: ''
+  item:
+    line: MaxAuthTries 3
+    regexp: ^#?MaxAuthTries .+
+  msg: ''
+ok: [iacgenie-server] => (item={'regexp': '^#?LoginGraceTime .+', 'line': 'LoginGraceTime 60'}) => changed=false 
+  ansible_loop_var: item
+  backup: ''
+  item:
+    line: LoginGraceTime 60
+    regexp: ^#?LoginGraceTime .+
+  msg: ''
+
+TASK [common : Common | Enable UFW] ********************************************
+ok: [iacgenie-server] => changed=false 
+  commands:
+  - /usr/sbin/ufw status verbose
+  - /usr/bin/grep -h '^### tuple' /lib/ufw/user.rules /lib/ufw/user6.rules /etc/ufw/user.rules /etc/ufw/user6.rules /var/lib/ufw/user.rules /var/lib/ufw/user6.rules
+
+TASK [common : Common | Set UFW default policies] ******************************
+ok: [iacgenie-server] => (item={'direction': 'incoming', 'policy': 'deny'}) => changed=false 
+  ansible_loop_var: item
+  commands:
+  - /usr/sbin/ufw status verbose
+  - /usr/bin/grep -h '^### tuple' /lib/ufw/user.rules /lib/ufw/user6.rules /etc/ufw/user.rules /etc/ufw/user6.rules /var/lib/ufw/user.rules /var/lib/ufw/user6.rules
+  item:
+    direction: incoming
+    policy: deny
+ok: [iacgenie-server] => (item={'direction': 'outgoing', 'policy': 'allow'}) => changed=false 
+  ansible_loop_var: item
+  commands:
+  - /usr/sbin/ufw status verbose
+  - /usr/bin/grep -h '^### tuple' /lib/ufw/user.rules /lib/ufw/user6.rules /etc/ufw/user.rules /etc/ufw/user6.rules /var/lib/ufw/user.rules /var/lib/ufw/user6.rules
+  item:
+    direction: outgoing
+    policy: allow
+
+TASK [common : Common | Add UFW rules for allowed ports] ***********************
+ok: [iacgenie-server] => (item=22/tcp) => changed=false 
+  ansible_loop_var: item
+  commands:
+  - /usr/sbin/ufw status verbose
+  - /usr/bin/grep -h '^### tuple' /lib/ufw/user.rules /lib/ufw/user6.rules /etc/ufw/user.rules /etc/ufw/user6.rules /var/lib/ufw/user.rules /var/lib/ufw/user6.rules
+  - /usr/sbin/ufw --version
+  - /usr/sbin/ufw --dry-run allow from any to any port 22 proto tcp
+  item: 22/tcp
+ok: [iacgenie-server] => (item=443/tcp) => changed=false 
+  ansible_loop_var: item
+  commands:
+  - /usr/sbin/ufw status verbose
+  - /usr/bin/grep -h '^### tuple' /lib/ufw/user.rules /lib/ufw/user6.rules /etc/ufw/user.rules /etc/ufw/user6.rules /var/lib/ufw/user.rules /var/lib/ufw/user6.rules
+  - /usr/sbin/ufw --version
+  - /usr/sbin/ufw --dry-run allow from any to any port 443 proto tcp
+  item: 443/tcp
+ok: [iacgenie-server] => (item=80/tcp) => changed=false 
+  ansible_loop_var: item
+  commands:
+  - /usr/sbin/ufw status verbose
+  - /usr/bin/grep -h '^### tuple' /lib/ufw/user.rules /lib/ufw/user6.rules /etc/ufw/user.rules /etc/ufw/user6.rules /var/lib/ufw/user.rules /var/lib/ufw/user6.rules
+  - /usr/sbin/ufw --version
+  - /usr/sbin/ufw --dry-run allow from any to any port 80 proto tcp
+  item: 80/tcp
+
+TASK [common : Common | Log UFW status] ****************************************
+skipping: [iacgenie-server] => changed=false 
+  cmd:
+  - ufw
+  - status
+  - verbose
+  delta: null
+  end: null
+  msg: Command would have run if not in check mode
+  rc: 0
+  start: null
+  stderr: ''
+  stderr_lines: <omitted>
+  stdout: ''
+  stdout_lines: <omitted>
+
+TASK [common : Common | Configure fail2ban for SSH] ****************************
+ok: [iacgenie-server] => changed=false 
+  checksum: edfb28bbc166f38efc4a55f27047fe7620e58f0e
+  dest: /etc/fail2ban/jail.local
+  gid: 0
+  group: root
+  mode: '0644'
+  owner: root
+  path: /etc/fail2ban/jail.local
+  size: 261
+  state: file
+  uid: 0
+
+TASK [common : Common | Enable and start fail2ban] *****************************
+ok: [iacgenie-server] => changed=false 
+  enabled: true
+  name: fail2ban
+  state: started
+  status:
+    ActiveEnterTimestamp: Fri 2026-07-31 14:18:39 UTC
+    ActiveEnterTimestampMonotonic: '4937132'
+    ActiveExitTimestampMonotonic: '0'
+    ActiveState: active
+    After: ip6tables.service -.mount systemd-journald.socket sysinit.target basic.target nftables.service iptables.service ipset.service firewalld.service system.slice network.target
+    AllowIsolate: 'no'
+    AssertResult: 'yes'
+    AssertTimestamp: Fri 2026-07-31 14:18:39 UTC
+    AssertTimestampMonotonic: '4935494'
+    Before: shutdown.target multi-user.target
+    BlockIOAccounting: 'no'
+    BlockIOWeight: '[not set]'
+    CPUAccounting: 'yes'
+    CPUAffinityFromNUMA: 'no'
+    CPUQuotaPerSecUSec: infinity
+    CPUQuotaPeriodUSec: infinity
+    CPUSchedulingPolicy: '0'
+    CPUSchedulingPriority: '0'
+    CPUSchedulingResetOnFork: 'no'
+    CPUShares: '[not set]'
+    CPUUsageNSec: '120597118000'
+    CPUWeight: '[not set]'
+    CacheDirectoryMode: '0755'
+    CanClean: runtime
+    CanFreeze: 'yes'
+    CanIsolate: 'no'
+    CanReload: 'yes'
+    CanStart: 'yes'
+    CanStop: 'yes'
+    CapabilityBoundingSet: cap_chown cap_dac_override cap_dac_read_search cap_fowner cap_fsetid cap_kill cap_setgid cap_setuid cap_setpcap cap_linux_immutable cap_net_bind_service cap_net_broadcast cap_net_admin cap_net_raw cap_ipc_lock cap_ipc_owner cap_sys_module cap_sys_rawio cap_sys_chroot cap_sys_ptrace cap_sys_pacct cap_sys_admin cap_sys_boot cap_sys_nice cap_sys_resource cap_sys_time cap_sys_tty_config cap_mknod cap_lease cap_audit_write cap_audit_control cap_setfcap cap_mac_override cap_mac_admin cap_syslog cap_wake_alarm cap_block_suspend cap_audit_read cap_perfmon cap_bpf cap_checkpoint_restore
+    CleanResult: success
+    CollectMode: inactive
+    ConditionResult: 'yes'
+    ConditionTimestamp: Fri 2026-07-31 14:18:39 UTC
+    ConditionTimestampMonotonic: '4935491'
+    ConfigurationDirectoryMode: '0755'
+    Conflicts: shutdown.target
+    ControlGroup: /system.slice/fail2ban.service
+    ControlGroupId: '5308'
+    ControlPID: '0'
+    CoredumpFilter: '0x33'
+    CoredumpReceive: 'no'
+    DefaultDependencies: 'yes'
+    DefaultMemoryLow: '0'
+    DefaultMemoryMin: '0'
+    DefaultStartupMemoryLow: '0'
+    Delegate: 'no'
+    Description: Fail2Ban Service
+    DevicePolicy: auto
+    Documentation: '"man:fail2ban(1)"'
+    DynamicUser: 'no'
+    EffectiveCPUs: 0-7
+    EffectiveMemoryNodes: '0'
+    Environment: PYTHONNOUSERSITE=yes
+    ExecMainCode: '0'
+    ExecMainExitTimestampMonotonic: '0'
+    ExecMainPID: '1038'
+    ExecMainStartTimestamp: Fri 2026-07-31 14:18:39 UTC
+    ExecMainStartTimestampMonotonic: '4936866'
+    ExecMainStatus: '0'
+    ExecReload: '{ path=/usr/bin/fail2ban-client ; argv[]=/usr/bin/fail2ban-client reload ; ignore_errors=no ; start_time=[n/a] ; stop_time=[n/a] ; pid=0 ; code=(null) ; status=0/0 }'
+    ExecReloadEx: '{ path=/usr/bin/fail2ban-client ; argv[]=/usr/bin/fail2ban-client reload ; flags= ; start_time=[n/a] ; stop_time=[n/a] ; pid=0 ; code=(null) ; status=0/0 }'
+    ExecStart: '{ path=/usr/bin/fail2ban-server ; argv[]=/usr/bin/fail2ban-server -xf start ; ignore_errors=no ; start_time=[n/a] ; stop_time=[n/a] ; pid=0 ; code=(null) ; status=0/0 }'
+    ExecStartEx: '{ path=/usr/bin/fail2ban-server ; argv[]=/usr/bin/fail2ban-server -xf start ; flags= ; start_time=[n/a] ; stop_time=[n/a] ; pid=0 ; code=(null) ; status=0/0 }'
+    ExecStop: '{ path=/usr/bin/fail2ban-client ; argv[]=/usr/bin/fail2ban-client stop ; ignore_errors=no ; start_time=[n/a] ; stop_time=[n/a] ; pid=0 ; code=(null) ; status=0/0 }'
+    ExecStopEx: '{ path=/usr/bin/fail2ban-client ; argv[]=/usr/bin/fail2ban-client stop ; flags= ; start_time=[n/a] ; stop_time=[n/a] ; pid=0 ; code=(null) ; status=0/0 }'
+    ExitType: main
+    ExtensionImagePolicy: root=verity+signed+encrypted+unprotected+absent:usr=verity+signed+encrypted+unprotected+absent:home=encrypted+unprotected+absent:srv=encrypted+unprotected+absent:tmp=encrypted+unprotected+absent:var=encrypted+unprotected+absent
+    FailureAction: none
+    FileDescriptorStoreMax: '0'
+    FileDescriptorStorePreserve: restart
+    FinalKillSignal: '9'
+    FragmentPath: /usr/lib/systemd/system/fail2ban.service
+    FreezerState: running
+    GID: '[not set]'
+    GuessMainPID: 'yes'
+    IOAccounting: 'no'
+    IOReadBytes: '[not set]'
+    IOReadOperations: '[not set]'
+    IOSchedulingClass: '2'
+    IOSchedulingPriority: '4'
+    IOWeight: '[not set]'
+    IOWriteBytes: '[not set]'
+    IOWriteOperations: '[not set]'
+    IPAccounting: 'no'
+    IPEgressBytes: '[no data]'
+    IPEgressPackets: '[no data]'
+    IPIngressBytes: '[no data]'
+    IPIngressPackets: '[no data]'
+    Id: fail2ban.service
+    IgnoreOnIsolate: 'no'
+    IgnoreSIGPIPE: 'yes'
+    InactiveEnterTimestampMonotonic: '0'
+    InactiveExitTimestamp: Fri 2026-07-31 14:18:39 UTC
+    InactiveExitTimestampMonotonic: '4937132'
+    InvocationID: 0b04a42e94c94594839b5120979e1440
+    JobRunningTimeoutUSec: infinity
+    JobTimeoutAction: none
+    JobTimeoutUSec: infinity
+    KeyringMode: private
+    KillMode: control-group
+    KillSignal: '15'
+    LimitAS: infinity
+    LimitASSoft: infinity
+    LimitCORE: infinity
+    LimitCORESoft: '0'
+    LimitCPU: infinity
+    LimitCPUSoft: infinity
+    LimitDATA: infinity
+    LimitDATASoft: infinity
+    LimitFSIZE: infinity
+    LimitFSIZESoft: infinity
+    LimitLOCKS: infinity
+    LimitLOCKSSoft: infinity
+    LimitMEMLOCK: '8388608'
+    LimitMEMLOCKSoft: '8388608'
+    LimitMSGQUEUE: '819200'
+    LimitMSGQUEUESoft: '819200'
+    LimitNICE: '0'
+    LimitNICESoft: '0'
+    LimitNOFILE: '524288'
+    LimitNOFILESoft: '1024'
+    LimitNPROC: '56170'
+    LimitNPROCSoft: '56170'
+    LimitRSS: infinity
+    LimitRSSSoft: infinity
+    LimitRTPRIO: '0'
+    LimitRTPRIOSoft: '0'
+    LimitRTTIME: infinity
+    LimitRTTIMESoft: infinity
+    LimitSIGPENDING: '56170'
+    LimitSIGPENDINGSoft: '56170'
+    LimitSTACK: infinity
+    LimitSTACKSoft: '8388608'
+    LoadState: loaded
+    LockPersonality: 'no'
+    LogLevelMax: '-1'
+    LogRateLimitBurst: '0'
+    LogRateLimitIntervalUSec: '0'
+    LogsDirectoryMode: '0755'
+    MainPID: '1038'
+    ManagedOOMMemoryPressure: auto
+    ManagedOOMMemoryPressureLimit: '0'
+    ManagedOOMPreference: none
+    ManagedOOMSwap: auto
+    MemoryAccounting: 'yes'
+    MemoryAvailable: '12325498880'
+    MemoryCurrent: '87588864'
+    MemoryDenyWriteExecute: 'no'
+    MemoryHigh: infinity
+    MemoryKSM: 'no'
+    MemoryLimit: infinity
+    MemoryLow: '0'
+    MemoryMax: infinity
+    MemoryMin: '0'
+    MemoryPeak: '93114368'
+    MemoryPressureThresholdUSec: 200ms
+    MemoryPressureWatch: auto
+    MemorySwapCurrent: '0'
+    MemorySwapMax: infinity
+    MemorySwapPeak: '0'
+    MemoryZSwapCurrent: '0'
+    MemoryZSwapMax: infinity
+    MountAPIVFS: 'no'
+    MountImagePolicy: root=verity+signed+encrypted+unprotected+absent:usr=verity+signed+encrypted+unprotected+absent:home=encrypted+unprotected+absent:srv=encrypted+unprotected+absent:tmp=encrypted+unprotected+absent:var=encrypted+unprotected+absent
+    NFileDescriptorStore: '0'
+    NRestarts: '0'
+    NUMAPolicy: n/a
+    Names: fail2ban.service
+    NeedDaemonReload: 'no'
+    Nice: '0'
+    NoNewPrivileges: 'no'
+    NonBlocking: 'no'
+    NotifyAccess: none
+    OOMPolicy: stop
+    OOMScoreAdjust: '0'
+    OnFailureJobMode: replace
+    OnSuccessJobMode: fail
+    PIDFile: /run/fail2ban/fail2ban.pid
+    PartOf: firewalld.service
+    Perpetual: 'no'
+    PrivateDevices: 'no'
+    PrivateIPC: 'no'
+    PrivateMounts: 'no'
+    PrivateNetwork: 'no'
+    PrivateTmp: 'no'
+    PrivateUsers: 'no'
+    ProcSubset: all
+    ProtectClock: 'no'
+    ProtectControlGroups: 'no'
+    ProtectHome: 'no'
+    ProtectHostname: 'no'
+    ProtectKernelLogs: 'no'
+    ProtectKernelModules: 'no'
+    ProtectKernelTunables: 'no'
+    ProtectProc: default
+    ProtectSystem: 'no'
+    RefuseManualStart: 'no'
+    RefuseManualStop: 'no'
+    ReloadResult: success
+    ReloadSignal: '1'
+    RemainAfterExit: 'no'
+    RemoveIPC: 'no'
+    Requires: -.mount sysinit.target system.slice
+    RequiresMountsFor: /run/fail2ban
+    Restart: on-failure
+    RestartKillSignal: '15'
+    RestartMaxDelayUSec: infinity
+    RestartMode: normal
+    RestartPreventExitStatus: 0 255
+    RestartSteps: '0'
+    RestartUSec: 100ms
+    RestartUSecNext: 100ms
+    RestrictNamespaces: 'no'
+    RestrictRealtime: 'no'
+    RestrictSUIDSGID: 'no'
+    Result: success
+    RootDirectoryStartOnly: 'no'
+    RootEphemeral: 'no'
+    RootImagePolicy: root=verity+signed+encrypted+unprotected+absent:usr=verity+signed+encrypted+unprotected+absent:home=encrypted+unprotected+absent:srv=encrypted+unprotected+absent:tmp=encrypted+unprotected+absent:var=encrypted+unprotected+absent
+    RuntimeDirectory: fail2ban
+    RuntimeDirectoryMode: '0755'
+    RuntimeDirectoryPreserve: 'no'
+    RuntimeMaxUSec: infinity
+    RuntimeRandomizedExtraUSec: '0'
+    SameProcessGroup: 'no'
+    SecureBits: '0'
+    SendSIGHUP: 'no'
+    SendSIGKILL: 'yes'
+    SetLoginEnvironment: 'no'
+    Slice: system.slice
+    StandardError: inherit
+    StandardInput: 'null'
+    StandardOutput: journal
+    StartLimitAction: none
+    StartLimitBurst: '5'
+    StartLimitIntervalUSec: 10s
+    StartupBlockIOWeight: '[not set]'
+    StartupCPUShares: '[not set]'
+    StartupCPUWeight: '[not set]'
+    StartupIOWeight: '[not set]'
+    StartupMemoryHigh: infinity
+    StartupMemoryLow: '0'
+    StartupMemoryMax: infinity
+    StartupMemorySwapMax: infinity
+    StartupMemoryZSwapMax: infinity
+    StateChangeTimestamp: Fri 2026-07-31 14:18:39 UTC
+    StateChangeTimestampMonotonic: '4937132'
+    StateDirectoryMode: '0755'
+    StatusErrno: '0'
+    StopWhenUnneeded: 'no'
+    SubState: running
+    SuccessAction: none
+    SurviveFinalKillSignal: 'no'
+    SyslogFacility: '3'
+    SyslogLevel: '6'
+    SyslogLevelPrefix: 'yes'
+    SyslogPriority: '30'
+    SystemCallErrorNumber: '2147483646'
+    TTYReset: 'no'
+    TTYVHangup: 'no'
+    TTYVTDisallocate: 'no'
+    TasksAccounting: 'yes'
+    TasksCurrent: '5'
+    TasksMax: '16851'
+    TimeoutAbortUSec: 1min 30s
+    TimeoutCleanUSec: infinity
+    TimeoutStartFailureMode: terminate
+    TimeoutStartUSec: 1min 30s
+    TimeoutStopFailureMode: terminate
+    TimeoutStopUSec: 1min 30s
+    TimerSlackNSec: '50000'
+    Transient: 'no'
+    Type: simple
+    UID: '[not set]'
+    UMask: '0022'
+    UnitFilePreset: enabled
+    UnitFileState: enabled
+    UtmpMode: init
+    WantedBy: multi-user.target
+    WatchdogSignal: '6'
+    WatchdogTimestampMonotonic: '0'
+    WatchdogUSec: '0'
+
+TASK [common : Common | Configure unattended-upgrades] *************************
+ok: [iacgenie-server] => changed=false 
+  checksum: 76d36705feedfdb3582c5be7f0b007d8d52816d3
+  dest: /etc/apt/apt.conf.d/50unattended-upgrades
+  gid: 0
+  group: root
+  mode: '0644'
+  owner: root
+  path: /etc/apt/apt.conf.d/50unattended-upgrades
+  size: 310
+  state: file
+  uid: 0
+
+TASK [common : Common | Configure logrotate] ***********************************
+ok: [iacgenie-server] => changed=false 
+  checksum: de005aa92fc8ce4b47d6d6a0ff1fb13d12762cf5
+  dest: /etc/logrotate.conf
+  gid: 0
+  group: root
+  mode: '0644'
+  owner: root
+  path: /etc/logrotate.conf
+  size: 411
+  state: file
+  uid: 0
+
+TASK [common : Common | Configure sysctl settings] *****************************
+skipping: [iacgenie-server] => changed=false 
+  false_condition: sysctl_settings is defined
+  skip_reason: Conditional result was False
+
+TASK [common : Common | Set sysctl settings defaults] **************************
+ok: [iacgenie-server] => changed=false 
+  ansible_facts:
+    sysctl_settings:
+    - key: net.ipv4.tcp_syncookies
+      value: '1'
+    - key: net.ipv4.icmp_echo_ignore_broadcasts
+      value: '1'
+    - key: net.ipv4.conf.all.accept_redirects
+      value: '0'
+    - key: net.ipv4.conf.all.send_redirects
+      value: '0'
+    - key: net.ipv4.conf.default.accept_redirects
+      value: '0'
+    - key: net.ipv4.conf.default.send_redirects
+      value: '0'
+
+TASK [common : Common | Create deploy user] ************************************
+ok: [iacgenie-server] => changed=false 
+  append: false
+  comment: Ansible deployment user
+  group: 27
+  home: /home/deploy
+  move_home: false
+  name: deploy
+  shell: /bin/bash
+  state: present
+  uid: 1001
+
+TASK [common : Common | Configure deploy user sudo access] *********************
+ok: [iacgenie-server] => changed=false 
+  backup: ''
+  msg: ''
+
+TASK [common : Common | Create .ssh directory for deploy user] *****************
+ok: [iacgenie-server] => changed=false 
+  gid: 1001
+  group: deploy
+  mode: '0700'
+  owner: deploy
+  path: /home/deploy/.ssh
+  size: 4096
+  state: directory
+  uid: 1001
+
+TASK [common : Common | Add SSH public keys for deploy user] *******************
+skipping: [iacgenie-server] => (item=REPLACE_WITH_ACTUAL_SSH_PUBLIC_KEY)  => changed=false 
+  ansible_loop_var: item
+  false_condition: item | length > 0 and not item.startswith('REPLACE_')
+  item: REPLACE_WITH_ACTUAL_SSH_PUBLIC_KEY
+  skip_reason: Conditional result was False
+skipping: [iacgenie-server] => changed=false 
+  msg: All items skipped
+
+TASK [common : Common | Add deploy user to docker group] ***********************
+changed: [iacgenie-server] => changed=true 
+  append: true
+  comment: Ansible deployment user
+  group: 27
+  groups: docker
+  home: /home/deploy
+  move_home: false
+  name: deploy
+  shell: /bin/bash
+  state: present
+  uid: 1001
+
+TASK [common : Common | Clean apt cache] ***************************************
+ok: [iacgenie-server] => changed=false 
+  stderr: ''
+  stderr_lines: <omitted>
+  stdout: |-
+    Reading package lists...
+    Building dependency tree...
+    Reading state information...
+  stdout_lines: <omitted>
+
+TASK [common : Common | Remove unnecessary packages] ***************************
+ok: [iacgenie-server] => changed=false
+
+TASK [common : Common | Clean temporary files] *********************************
+ok: [iacgenie-server] => (item=/tmp/.X*) => changed=false 
+  ansible_loop_var: item
+  item: /tmp/.X*
+  path: /tmp/.X*
+  state: absent
+ok: [iacgenie-server] => (item=/tmp/.lock*) => changed=false 
+  ansible_loop_var: item
+  item: /tmp/.lock*
+  path: /tmp/.lock*
+  state: absent
+ok: [iacgenie-server] => (item=/var/tmp/*~) => changed=false 
+  ansible_loop_var: item
+  item: /var/tmp/*~
+  path: /var/tmp/*~
+  state: absent
+
+TASK [docker : Docker | Install Docker prerequisites] **************************
+ok: [iacgenie-server] => changed=false 
+  cache_update_time: 1785580818
+  cache_updated: true
+
+TASK [docker : Docker | Create keyrings directory] *****************************
+ok: [iacgenie-server] => changed=false 
+  gid: 0
+  group: root
+  mode: '0755'
+  owner: root
+  path: /etc/apt/keyrings
+  size: 4096
+  state: directory
+  uid: 0
+
+TASK [docker : Docker | Add Docker GPG key] ************************************
+ok: [iacgenie-server] => changed=false 
+  before:
+  - 8D81803C0EBFCD88
+  - 7EA0A9C3F273FCD8
+  fp: 8D81803C0EBFCD88
+  id: 8D81803C0EBFCD88
+  key_id: 8D81803C0EBFCD88
+  short_id: 0EBFCD88
+
+TASK [docker : Docker | Add Docker repository] *********************************
+changed: [iacgenie-server] => changed=true 
+  repo: deb [arch=amd64 signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu circe stable
+  sources_added: []
+  sources_removed: []
+  state: present
+
+TASK [docker : Docker | Install Docker CE packages] ****************************
+ok: [iacgenie-server] => changed=false 
+  cache_update_time: 1785580818
+  cache_updated: true
+
+TASK [docker : Docker | Ensure Docker service is enabled and running] **********
+ok: [iacgenie-server] => changed=false 
+  enabled: true
+  name: docker
+  state: started
+  status:
+    ActiveEnterTimestamp: Sat 2026-08-01 10:54:56 UTC
+    ActiveEnterTimestampMonotonic: '74178792046'
+    ActiveExitTimestamp: Sat 2026-08-01 10:54:50 UTC
+    ActiveExitTimestampMonotonic: '74172884190'
+    ActiveState: active
+    After: firewalld.service nss-lookup.target time-set.target basic.target system.slice docker.socket containerd.service network-online.target systemd-journald.socket sysinit.target
+    AllowIsolate: 'no'
+    AssertResult: 'yes'
+    AssertTimestamp: Sat 2026-08-01 10:54:55 UTC
+    AssertTimestampMonotonic: '74177893358'
+    Before: lightserp.service multi-user.target iacgenie-docker-compose.service gitea-runner.service shutdown.target cloudflared-iacgenie.service
+    BlockIOAccounting: 'no'
+    BlockIOWeight: '[not set]'
+    BoundBy: cloudflared-iacgenie.service
+    CPUAccounting: 'yes'
+    CPUAffinityFromNUMA: 'no'
+    CPUQuotaPerSecUSec: infinity
+    CPUQuotaPeriodUSec: infinity
+    CPUSchedulingPolicy: '0'
+    CPUSchedulingPriority: '0'
+    CPUSchedulingResetOnFork: 'no'
+    CPUShares: '[not set]'
+    CPUUsageNSec: '1120607858000'
+    CPUWeight: '[not set]'
+    CacheDirectoryMode: '0755'
+    CanFreeze: 'yes'
+    CanIsolate: 'no'
+    CanReload: 'yes'
+    CanStart: 'yes'
+    CanStop: 'yes'
+    CapabilityBoundingSet: cap_chown cap_dac_override cap_dac_read_search cap_fowner cap_fsetid cap_kill cap_setgid cap_setuid cap_setpcap cap_linux_immutable cap_net_bind_service cap_net_broadcast cap_net_admin cap_net_raw cap_ipc_lock cap_ipc_owner cap_sys_module cap_sys_rawio cap_sys_chroot cap_sys_ptrace cap_sys_pacct cap_sys_admin cap_sys_boot cap_sys_nice cap_sys_resource cap_sys_time cap_sys_tty_config cap_mknod cap_lease cap_audit_write cap_audit_control cap_setfcap cap_mac_override cap_mac_admin cap_syslog cap_wake_alarm cap_block_suspend cap_audit_read cap_perfmon cap_bpf cap_checkpoint_restore
+    CleanResult: success
+    CollectMode: inactive
+    ConditionResult: 'yes'
+    ConditionTimestamp: Sat 2026-08-01 10:54:55 UTC
+    ConditionTimestampMonotonic: '74177893356'
+    ConfigurationDirectoryMode: '0755'
+    Conflicts: shutdown.target
+    ControlGroup: /system.slice/docker.service
+    ControlGroupId: '500185'
+    ControlPID: '0'
+    CoredumpFilter: '0x33'
+    CoredumpReceive: 'no'
+    DefaultDependencies: 'yes'
+    DefaultMemoryLow: '0'
+    DefaultMemoryMin: '0'
+    DefaultStartupMemoryLow: '0'
+    Delegate: 'yes'
+    DelegateControllers: cpu cpuset io memory pids
+    Description: Docker Application Container Engine
+    DevicePolicy: auto
+    Documentation: https://docs.docker.com
+    DynamicUser: 'no'
+    EffectiveCPUs: 0-7
+    EffectiveMemoryNodes: '0'
+    ExecMainCode: '0'
+    ExecMainExitTimestampMonotonic: '0'
+    ExecMainPID: '2134749'
+    ExecMainStartTimestamp: Sat 2026-08-01 10:54:55 UTC
+    ExecMainStartTimestampMonotonic: '74177900178'
+    ExecMainStatus: '0'
+    ExecReload: '{ path=/bin/kill ; argv[]=/bin/kill -s HUP $MAINPID ; ignore_errors=no ; start_time=[n/a] ; stop_time=[n/a] ; pid=0 ; code=(null) ; status=0/0 }'
+    ExecReloadEx: '{ path=/bin/kill ; argv[]=/bin/kill -s HUP $MAINPID ; flags= ; start_time=[n/a] ; stop_time=[n/a] ; pid=0 ; code=(null) ; status=0/0 }'
+    ExecStart: '{ path=/usr/bin/dockerd ; argv[]=/usr/bin/dockerd -H fd:// --containerd=/run/containerd/containerd.sock ; ignore_errors=no ; start_time=[Sat 2026-08-01 10:54:55 UTC] ; stop_time=[n/a] ; pid=2134749 ; code=(null) ; status=0/0 }'
+    ExecStartEx: '{ path=/usr/bin/dockerd ; argv[]=/usr/bin/dockerd -H fd:// --containerd=/run/containerd/containerd.sock ; flags= ; start_time=[Sat 2026-08-01 10:54:55 UTC] ; stop_time=[n/a] ; pid=2134749 ; code=(null) ; status=0/0 }'
+    ExitType: main
+    ExtensionImagePolicy: root=verity+signed+encrypted+unprotected+absent:usr=verity+signed+encrypted+unprotected+absent:home=encrypted+unprotected+absent:srv=encrypted+unprotected+absent:tmp=encrypted+unprotected+absent:var=encrypted+unprotected+absent
+    FailureAction: none
+    FileDescriptorStoreMax: '0'
+    FileDescriptorStorePreserve: restart
+    FinalKillSignal: '9'
+    FragmentPath: /usr/lib/systemd/system/docker.service
+    FreezerState: running
+    GID: '[not set]'
+    GuessMainPID: 'yes'
+    IOAccounting: 'no'
+    IOReadBytes: '[not set]'
+    IOReadOperations: '[not set]'
+    IOSchedulingClass: '2'
+    IOSchedulingPriority: '4'
+    IOWeight: '[not set]'
+    IOWriteBytes: '[not set]'
+    IOWriteOperations: '[not set]'
+    IPAccounting: 'no'
+    IPEgressBytes: '[no data]'
+    IPEgressPackets: '[no data]'
+    IPIngressBytes: '[no data]'
+    IPIngressPackets: '[no data]'
+    Id: docker.service
+    IgnoreOnIsolate: 'no'
+    IgnoreSIGPIPE: 'yes'
+    InactiveEnterTimestamp: Sat 2026-08-01 10:54:55 UTC
+    InactiveEnterTimestampMonotonic: '74177892428'
+    InactiveExitTimestamp: Sat 2026-08-01 10:54:55 UTC
+    InactiveExitTimestampMonotonic: '74177900445'
+    InvocationID: f30a3b9355914bf980be6dc0eedad803
+    JobRunningTimeoutUSec: infinity
+    JobTimeoutAction: none
+    JobTimeoutUSec: infinity
+    KeyringMode: private
+    KillMode: process
+    KillSignal: '15'
+    LimitAS: infinity
+    LimitASSoft: infinity
+    LimitCORE: infinity
+    LimitCORESoft: infinity
+    LimitCPU: infinity
+    LimitCPUSoft: infinity
+    LimitDATA: infinity
+    LimitDATASoft: infinity
+    LimitFSIZE: infinity
+    LimitFSIZESoft: infinity
+    LimitLOCKS: infinity
+    LimitLOCKSSoft: infinity
+    LimitMEMLOCK: '8388608'
+    LimitMEMLOCKSoft: '8388608'
+    LimitMSGQUEUE: '819200'
+    LimitMSGQUEUESoft: '819200'
+    LimitNICE: '0'
+    LimitNICESoft: '0'
+    LimitNOFILE: '524288'
+    LimitNOFILESoft: '1024'
+    LimitNPROC: infinity
+    LimitNPROCSoft: infinity
+    LimitRSS: infinity
+    LimitRSSSoft: infinity
+    LimitRTPRIO: '0'
+    LimitRTPRIOSoft: '0'
+    LimitRTTIME: infinity
+    LimitRTTIMESoft: infinity
+    LimitSIGPENDING: '56170'
+    LimitSIGPENDINGSoft: '56170'
+    LimitSTACK: infinity
+    LimitSTACKSoft: '8388608'
+    LoadState: loaded
+    LockPersonality: 'no'
+    LogLevelMax: '-1'
+    LogRateLimitBurst: '0'
+    LogRateLimitIntervalUSec: '0'
+    LogsDirectoryMode: '0755'
+    MainPID: '2134749'
+    ManagedOOMMemoryPressure: auto
+    ManagedOOMMemoryPressureLimit: '0'
+    ManagedOOMPreference: none
+    ManagedOOMSwap: auto
+    MemoryAccounting: 'yes'
+    MemoryAvailable: '12275392512'
+    MemoryCurrent: '3509039104'
+    MemoryDenyWriteExecute: 'no'
+    MemoryHigh: infinity
+    MemoryKSM: 'no'
+    MemoryLimit: infinity
+    MemoryLow: '0'
+    MemoryMax: infinity
+    MemoryMin: '0'
+    MemoryPeak: '3622879232'
+    MemoryPressureThresholdUSec: 200ms
+    MemoryPressureWatch: auto
+    MemorySwapCurrent: '0'
+    MemorySwapMax: infinity
+    MemorySwapPeak: '0'
+    MemoryZSwapCurrent: '0'
+    MemoryZSwapMax: infinity
+    MountAPIVFS: 'no'
+    MountImagePolicy: root=verity+signed+encrypted+unprotected+absent:usr=verity+signed+encrypted+unprotected+absent:home=encrypted+unprotected+absent:srv=encrypted+unprotected+absent:tmp=encrypted+unprotected+absent:var=encrypted+unprotected+absent
+    NFileDescriptorStore: '0'
+    NRestarts: '0'
+    NUMAPolicy: n/a
+    Names: docker.service
+    NeedDaemonReload: 'no'
+    Nice: '0'
+    NoNewPrivileges: 'no'
+    NonBlocking: 'no'
+    NotifyAccess: main
+    OOMPolicy: continue
+    OOMScoreAdjust: '-500'
+    OnFailureJobMode: replace
+    OnSuccessJobMode: fail
+    Perpetual: 'no'
+    PrivateDevices: 'no'
+    PrivateIPC: 'no'
+    PrivateMounts: 'no'
+    PrivateNetwork: 'no'
+    PrivateTmp: 'no'
+    PrivateUsers: 'no'
+    ProcSubset: all
+    ProtectClock: 'no'
+    ProtectControlGroups: 'no'
+    ProtectHome: 'no'
+    ProtectHostname: 'no'
+    ProtectKernelLogs: 'no'
+    ProtectKernelModules: 'no'
+    ProtectKernelTunables: 'no'
+    ProtectProc: default
+    ProtectSystem: 'no'
+    RefuseManualStart: 'no'
+    RefuseManualStop: 'no'
+    ReloadResult: success
+    ReloadSignal: '1'
+    RemainAfterExit: 'no'
+    RemoveIPC: 'no'
+    RequiredBy: lightserp.service iacgenie-docker-compose.service
+    Requires: sysinit.target system.slice docker.socket
+    Restart: always
+    RestartKillSignal: '15'
+    RestartMaxDelayUSec: infinity
+    RestartMode: normal
+    RestartSteps: '0'
+    RestartUSec: 2s
+    RestartUSecNext: 2s
+    RestrictNamespaces: 'no'
+    RestrictRealtime: 'no'
+    RestrictSUIDSGID: 'no'
+    Result: success
+    RootDirectoryStartOnly: 'no'
+    RootEphemeral: 'no'
+    RootImagePolicy: root=verity+signed+encrypted+unprotected+absent:usr=verity+signed+encrypted+unprotected+absent:home=encrypted+unprotected+absent:srv=encrypted+unprotected+absent:tmp=encrypted+unprotected+absent:var=encrypted+unprotected+absent
+    RuntimeDirectoryMode: '0755'
+    RuntimeDirectoryPreserve: 'no'
+    RuntimeMaxUSec: infinity
+    RuntimeRandomizedExtraUSec: '0'
+    SameProcessGroup: 'no'
+    SecureBits: '0'
+    SendSIGHUP: 'no'
+    SendSIGKILL: 'yes'
+    SetLoginEnvironment: 'no'
+    Slice: system.slice
+    StandardError: inherit
+    StandardInput: 'null'
+    StandardOutput: journal
+    StartLimitAction: none
+    StartLimitBurst: '3'
+    StartLimitIntervalUSec: 1min
+    StartupBlockIOWeight: '[not set]'
+    StartupCPUShares: '[not set]'
+    StartupCPUWeight: '[not set]'
+    StartupIOWeight: '[not set]'
+    StartupMemoryHigh: infinity
+    StartupMemoryLow: '0'
+    StartupMemoryMax: infinity
+    StartupMemorySwapMax: infinity
+    StartupMemoryZSwapMax: infinity
+    StateChangeTimestamp: Sat 2026-08-01 10:54:56 UTC
+    StateChangeTimestampMonotonic: '74178792046'
+    StateDirectoryMode: '0755'
+    StatusErrno: '0'
+    StopWhenUnneeded: 'no'
+    SubState: running
+    SuccessAction: none
+    SurviveFinalKillSignal: 'no'
+    SyslogFacility: '3'
+    SyslogLevel: '6'
+    SyslogLevelPrefix: 'yes'
+    SyslogPriority: '30'
+    SystemCallErrorNumber: '2147483646'
+    TTYReset: 'no'
+    TTYVHangup: 'no'
+    TTYVTDisallocate: 'no'
+    TasksAccounting: 'yes'
+    TasksCurrent: '155'
+    TasksMax: infinity
+    TimeoutAbortUSec: 1min 30s
+    TimeoutCleanUSec: infinity
+    TimeoutStartFailureMode: terminate
+    TimeoutStartUSec: infinity
+    TimeoutStopFailureMode: terminate
+    TimeoutStopUSec: 1min 30s
+    TimerSlackNSec: '50000'
+    Transient: 'no'
+    TriggeredBy: docker.socket
+    Type: notify
+    UID: '[not set]'
+    UMask: '0022'
+    UnitFilePreset: enabled
+    UnitFileState: enabled
+    UtmpMode: init
+    WantedBy: gitea-runner.service multi-user.target cloudflared-iacgenie.service
+    Wants: containerd.service network-online.target
+    WatchdogSignal: '6'
+    WatchdogTimestampMonotonic: '0'
+    WatchdogUSec: '0'
+
+TASK [docker : Docker | Create Docker daemon config directory] *****************
+ok: [iacgenie-server] => changed=false 
+  gid: 0
+  group: root
+  mode: '0755'
+  owner: root
+  path: /etc/docker
+  size: 4096
+  state: directory
+  uid: 0
+
+TASK [docker : Docker | Deploy Docker daemon configuration] ********************
+--- before: /etc/docker/daemon.json
++++ after: /Users/manjunathkanavi/.ansible/tmp/ansible-local-2355vh91a0uo/tmp5kz0kp8r/daemon.json.j2
+@@ -5,8 +5,9 @@
+     "max-file": "3"
+   },
+   "storage-driver": "overlay2",
+-  "default-address-pools": [
+-    {"base": "172.28.0.0/16", "size": 24}
+-  ],
+-  "dns": ["8.8.8.8", "1.1.1.1"]
++  "dns": ["8.8.8.8", "1.1.1.1"],
++  "default-address-pools": [{
++    "base": "172.28.0.0/16",
++    "size": 24
++  }]
+ }
+
+changed: [iacgenie-server] => changed=true
+
+TASK [docker : Docker | Verify Docker Compose plugin is installed] *************
+skipping: [iacgenie-server] => changed=false 
+  cmd:
+  - docker
+  - compose
+  - version
+  delta: null
+  end: null
+  msg: Command would have run if not in check mode
+  rc: 0
+  start: null
+  stderr: ''
+  stderr_lines: <omitted>
+  stdout: ''
+  stdout_lines: <omitted>
+
+TASK [docker : Docker | Log Docker Compose version] ****************************
+ok: [iacgenie-server] => 
+  msg: 'Docker Compose version: '
+
+TASK [docker : Docker | Create Docker group (if not exists)] *******************
+ok: [iacgenie-server] => changed=false 
+  gid: 125
+  name: docker
+  state: present
+  system: false
+
+TASK [ntp_config : NTP | Install chrony] ***************************************
+ok: [iacgenie-server] => changed=false 
+  cache_update_time: 1785580818
+  cache_updated: true
+
+TASK [ntp_config : NTP | Configure chrony] *************************************
+ok: [iacgenie-server] => changed=false 
+  checksum: 8214d4636ed87c4b6b56c544bcb67756594b3512
+  dest: /etc/chrony/chrony.conf
+  gid: 0
+  group: root
+  mode: '0644'
+  owner: root
+  path: /etc/chrony/chrony.conf
+  size: 1048
+  state: file
+  uid: 0
+
+TASK [ntp_config : NTP | Enable and start chrony] ******************************
+ok: [iacgenie-server] => changed=false 
+  enabled: true
+  name: chrony
+  state: started
+  status:
+    ActiveEnterTimestamp: Sat 2026-08-01 10:43:14 UTC
+    ActiveEnterTimestampMonotonic: '73476898032'
+    ActiveExitTimestampMonotonic: '0'
+    ActiveState: active
+    After: systemd-tmpfiles-setup.service sysinit.target systemd-remount-fs.service basic.target network.target systemd-journald.socket tmp.mount -.mount system.slice
+    AllowIsolate: 'no'
+    AssertResult: 'yes'
+    AssertTimestamp: Sat 2026-08-01 10:43:14 UTC
+    AssertTimestampMonotonic: '73476859487'
+    Before: time-sync.target shutdown.target multi-user.target
+    BlockIOAccounting: 'no'
+    BlockIOWeight: '[not set]'
+    CPUAccounting: 'yes'
+    CPUAffinityFromNUMA: 'no'
+    CPUQuotaPerSecUSec: infinity
+    CPUQuotaPeriodUSec: infinity
+    CPUSchedulingPolicy: '0'
+    CPUSchedulingPriority: '0'
+    CPUSchedulingResetOnFork: 'no'
+    CPUShares: '[not set]'
+    CPUUsageNSec: '14467485000'
+    CPUWeight: '[not set]'
+    CacheDirectoryMode: '0755'
+    CanClean: runtime state logs configuration
+    CanFreeze: 'yes'
+    CanIsolate: 'no'
+    CanReload: 'no'
+    CanStart: 'yes'
+    CanStop: 'yes'
+    CapabilityBoundingSet: cap_chown cap_dac_override cap_dac_read_search cap_fowner cap_fsetid cap_setgid cap_setuid cap_setpcap cap_net_bind_service cap_net_broadcast cap_net_admin cap_net_raw cap_ipc_lock cap_ipc_owner cap_sys_nice cap_sys_resource cap_sys_time cap_setfcap cap_perfmon cap_bpf cap_checkpoint_restore
+    CleanResult: success
+    CollectMode: inactive
+    ConditionResult: 'yes'
+    ConditionTimestamp: Sat 2026-08-01 10:43:14 UTC
+    ConditionTimestampMonotonic: '73476859485'
+    ConfigurationDirectory: chrony
+    ConfigurationDirectoryMode: '0755'
+    Conflicts: ntpsec.service shutdown.target openntpd.service ntp.service
+    ControlGroup: /system.slice/chrony.service
+    ControlGroupId: '498010'
+    ControlPID: '0'
+    CoredumpFilter: '0x33'
+    CoredumpReceive: 'no'
+    DefaultDependencies: 'yes'
+    DefaultMemoryLow: '0'
+    DefaultMemoryMin: '0'
+    DefaultStartupMemoryLow: '0'
+    Delegate: 'no'
+    Description: chrony, an NTP client/server
+    DeviceAllow: char-pps rw
+    DevicePolicy: closed
+    Documentation: '"man:chronyd(8)" "man:chronyc(1)" "man:chrony.conf(5)"'
+    DynamicUser: 'no'
+    EffectiveCPUs: 0-7
+    EffectiveMemoryNodes: '0'
+    EnvironmentFiles: /etc/default/chrony (ignore_errors=yes)
+    ExecMainCode: '0'
+    ExecMainExitTimestampMonotonic: '0'
+    ExecMainPID: '2126830'
+    ExecMainStartTimestamp: Sat 2026-08-01 10:43:14 UTC
+    ExecMainStartTimestampMonotonic: '73476897983'
+    ExecMainStatus: '0'
+    ExecStart: '{ path=/usr/lib/systemd/scripts/chronyd-starter.sh ; argv[]=/usr/lib/systemd/scripts/chronyd-starter.sh $DAEMON_OPTS ; ignore_errors=no ; start_time=[Sat 2026-08-01 10:43:14 UTC] ; stop_time=[Sat 2026-08-01 10:43:14 UTC] ; pid=2126821 ; code=exited ; status=0 }'
+    ExecStartEx: '{ path=/usr/lib/systemd/scripts/chronyd-starter.sh ; argv[]=/usr/lib/systemd/scripts/chronyd-starter.sh $DAEMON_OPTS ; flags=no-setuid ; start_time=[Sat 2026-08-01 10:43:14 UTC] ; stop_time=[Sat 2026-08-01 10:43:14 UTC] ; pid=2126821 ; code=exited ; status=0 }'
+    ExitType: main
+    ExtensionImagePolicy: root=verity+signed+encrypted+unprotected+absent:usr=verity+signed+encrypted+unprotected+absent:home=encrypted+unprotected+absent:srv=encrypted+unprotected+absent:tmp=encrypted+unprotected+absent:var=encrypted+unprotected+absent
+    FailureAction: none
+    FileDescriptorStoreMax: '0'
+    FileDescriptorStorePreserve: restart
+    FinalKillSignal: '9'
+    FragmentPath: /usr/lib/systemd/system/chrony.service
+    FreezerState: running
+    GID: '127'
+    GuessMainPID: 'yes'
+    IOAccounting: 'no'
+    IOReadBytes: '[not set]'
+    IOReadOperations: '[not set]'
+    IOSchedulingClass: '2'
+    IOSchedulingPriority: '4'
+    IOWeight: '[not set]'
+    IOWriteBytes: '[not set]'
+    IOWriteOperations: '[not set]'
+    IPAccounting: 'no'
+    IPEgressBytes: '[no data]'
+    IPEgressPackets: '[no data]'
+    IPIngressBytes: '[no data]'
+    IPIngressPackets: '[no data]'
+    Id: chrony.service
+    IgnoreOnIsolate: 'no'
+    IgnoreSIGPIPE: 'yes'
+    InactiveEnterTimestampMonotonic: '0'
+    InactiveExitTimestamp: Sat 2026-08-01 10:43:14 UTC
+    InactiveExitTimestampMonotonic: '73476874369'
+    InvocationID: c44a8ca11a2248f49872edd76f32c40e
+    JobRunningTimeoutUSec: infinity
+    JobTimeoutAction: none
+    JobTimeoutUSec: infinity
+    KeyringMode: private
+    KillMode: control-group
+    KillSignal: '15'
+    LimitAS: infinity
+    LimitASSoft: infinity
+    LimitCORE: infinity
+    LimitCORESoft: '0'
+    LimitCPU: infinity
+    LimitCPUSoft: infinity
+    LimitDATA: infinity
+    LimitDATASoft: infinity
+    LimitFSIZE: infinity
+    LimitFSIZESoft: infinity
+    LimitLOCKS: infinity
+    LimitLOCKSSoft: infinity
+    LimitMEMLOCK: '8388608'
+    LimitMEMLOCKSoft: '8388608'
+    LimitMSGQUEUE: '819200'
+    LimitMSGQUEUESoft: '819200'
+    LimitNICE: '0'
+    LimitNICESoft: '0'
+    LimitNOFILE: '524288'
+    LimitNOFILESoft: '1024'
+    LimitNPROC: '56170'
+    LimitNPROCSoft: '56170'
+    LimitRSS: infinity
+    LimitRSSSoft: infinity
+    LimitRTPRIO: '0'
+    LimitRTPRIOSoft: '0'
+    LimitRTTIME: infinity
+    LimitRTTIMESoft: infinity
+    LimitSIGPENDING: '56170'
+    LimitSIGPENDINGSoft: '56170'
+    LimitSTACK: infinity
+    LimitSTACKSoft: '8388608'
+    LoadState: loaded
+    LockPersonality: 'yes'
+    LogLevelMax: '-1'
+    LogRateLimitBurst: '0'
+    LogRateLimitIntervalUSec: '0'
+    LogsDirectory: chrony
+    LogsDirectoryMode: '0750'
+    MainPID: '2126830'
+    ManagedOOMMemoryPressure: auto
+    ManagedOOMMemoryPressureLimit: '0'
+    ManagedOOMPreference: none
+    ManagedOOMSwap: auto
+    MemoryAccounting: 'yes'
+    MemoryAvailable: '12281352192'
+    MemoryCurrent: '1490944'
+    MemoryDenyWriteExecute: 'yes'
+    MemoryHigh: infinity
+    MemoryKSM: 'no'
+    MemoryLimit: infinity
+    MemoryLow: '0'
+    MemoryMax: infinity
+    MemoryMin: '0'
+    MemoryPeak: '3317760'
+    MemoryPressureThresholdUSec: 200ms
+    MemoryPressureWatch: auto
+    MemorySwapCurrent: '0'
+    MemorySwapMax: infinity
+    MemorySwapPeak: '0'
+    MemoryZSwapCurrent: '0'
+    MemoryZSwapMax: infinity
+    MountAPIVFS: 'no'
+    MountImagePolicy: root=verity+signed+encrypted+unprotected+absent:usr=verity+signed+encrypted+unprotected+absent:home=encrypted+unprotected+absent:srv=encrypted+unprotected+absent:tmp=encrypted+unprotected+absent:var=encrypted+unprotected+absent
+    NFileDescriptorStore: '0'
+    NRestarts: '0'
+    NUMAPolicy: n/a
+    Names: chrony.service chronyd.service
+    NeedDaemonReload: 'no'
+    Nice: '0'
+    NoNewPrivileges: 'no'
+    NonBlocking: 'no'
+    NotifyAccess: none
+    OOMPolicy: stop
+    OOMScoreAdjust: '0'
+    OnFailureJobMode: replace
+    OnSuccessJobMode: fail
+    PIDFile: /run/chrony/chronyd.pid
+    Perpetual: 'no'
+    PrivateDevices: 'no'
+    PrivateIPC: 'no'
+    PrivateMounts: 'no'
+    PrivateNetwork: 'no'
+    PrivateTmp: 'yes'
+    PrivateUsers: 'no'
+    ProcSubset: pid
+    ProtectClock: 'no'
+    ProtectControlGroups: 'yes'
+    ProtectHome: 'yes'
+    ProtectHostname: 'yes'
+    ProtectKernelLogs: 'yes'
+    ProtectKernelModules: 'yes'
+    ProtectKernelTunables: 'yes'
+    ProtectProc: invisible
+    ProtectSystem: strict
+    ReadWritePaths: /run -/var/spool
+    RefuseManualStart: 'no'
+    RefuseManualStop: 'no'
+    ReloadResult: success
+    ReloadSignal: '1'
+    RemainAfterExit: 'no'
+    RemoveIPC: 'no'
+    Requires: -.mount sysinit.target system.slice
+    RequiresMountsFor: /etc/chrony /var/tmp /var/log/chrony /run/chrony /var/lib/chrony
+    Restart: 'no'
+    RestartKillSignal: '15'
+    RestartMaxDelayUSec: infinity
+    RestartMode: normal
+    RestartSteps: '0'
+    RestartUSec: 100ms
+    RestartUSecNext: 100ms
+    RestrictAddressFamilies: AF_INET AF_INET6 AF_NETLINK AF_UNIX
+    RestrictNamespaces: 'yes'
+    RestrictRealtime: 'no'
+    RestrictSUIDSGID: 'yes'
+    Result: success
+    RootDirectoryStartOnly: 'no'
+    RootEphemeral: 'no'
+    RootImagePolicy: root=verity+signed+encrypted+unprotected+absent:usr=verity+signed+encrypted+unprotected+absent:home=encrypted+unprotected+absent:srv=encrypted+unprotected+absent:tmp=encrypted+unprotected+absent:var=encrypted+unprotected+absent
+    RuntimeDirectory: chrony
+    RuntimeDirectoryMode: '0700'
+    RuntimeDirectoryPreserve: restart
+    RuntimeMaxUSec: infinity
+    RuntimeRandomizedExtraUSec: '0'
+    SameProcessGroup: 'no'
+    SecureBits: '0'
+    SendSIGHUP: 'no'
+    SendSIGKILL: 'yes'
+    SetLoginEnvironment: 'no'
+    Slice: system.slice
+    StandardError: inherit
+    StandardInput: 'null'
+    StandardOutput: journal
+    StartLimitAction: none
+    StartLimitBurst: '5'
+    StartLimitIntervalUSec: 10s
+    StartupBlockIOWeight: '[not set]'
+    StartupCPUShares: '[not set]'
+    StartupCPUWeight: '[not set]'
+    StartupIOWeight: '[not set]'
+    StartupMemoryHigh: infinity
+    StartupMemoryLow: '0'
+    StartupMemoryMax: infinity
+    StartupMemorySwapMax: infinity
+    StartupMemoryZSwapMax: infinity
+    StateChangeTimestamp: Sat 2026-08-01 10:43:14 UTC
+    StateChangeTimestampMonotonic: '73476898032'
+    StateDirectory: chrony
+    StateDirectoryMode: '0750'
+    StatusErrno: '0'
+    StopWhenUnneeded: 'no'
+    SubState: running
+    SuccessAction: none
+    SurviveFinalKillSignal: 'no'
+    SyslogFacility: '3'
+    SyslogLevel: '6'
+    SyslogLevelPrefix: 'yes'
+    SyslogPriority: '30'
+    SystemCallArchitectures: native
+    SystemCallErrorNumber: '2147483646'
+    SystemCallFilter: ~_sysctl afs_syscall bdflush break chroot create_module delete_module finit_module fsconfig fsmount fsopen fspick ftime get_kernel_syms getpmsg gtty idle init_module ioperm iopl kexec_file_load kexec_load lock lookup_dcookie modify_ldt mount mount_setattr move_mount mpx open_tree pciconfig_iobase pciconfig_read pciconfig_write perf_event_open pidfd_getfd pivot_root prof profil ptrace putpmsg query_module reboot rtas s390_pci_mmio_read s390_pci_mmio_write s390_runtime_instr security sgetmask ssetmask stime stty subpage_prot swapoff swapon switch_endian sysfs tuxcall ulimit umount umount2 uselib ustat vm86 vm86old vserver
+    TTYReset: 'no'
+    TTYVHangup: 'no'
+    TTYVTDisallocate: 'no'
+    TasksAccounting: 'yes'
+    TasksCurrent: '2'
+    TasksMax: '16851'
+    TimeoutAbortUSec: 1min 30s
+    TimeoutCleanUSec: infinity
+    TimeoutStartFailureMode: terminate
+    TimeoutStartUSec: 1min 30s
+    TimeoutStopFailureMode: terminate
+    TimeoutStopUSec: 1min 30s
+    TimerSlackNSec: '50000'
+    Transient: 'no'
+    Type: forking
+    UID: '124'
+    UMask: '0022'
+    UnitFilePreset: enabled
+    UnitFileState: enabled
+    User: _chrony
+    UtmpMode: init
+    WantedBy: multi-user.target
+    Wants: tmp.mount time-sync.target
+    WatchdogSignal: '6'
+    WatchdogTimestampMonotonic: '0'
+    WatchdogUSec: '0'
+
+TASK [ntp_config : NTP | Verify NTP synchronization] ***************************
+skipping: [iacgenie-server] => changed=false 
+  cmd:
+  - chronyc
+  - tracking
+  delta: null
+  end: null
+  msg: Command would have run if not in check mode
+  rc: 0
+  start: null
+  stderr: ''
+  stderr_lines: <omitted>
+  stdout: ''
+  stdout_lines: <omitted>
+
+TASK [ntp_config : NTP | Log NTP status] ***************************************
+ok: [iacgenie-server] => 
+  msg: 'NTP tracking: '
+
+RUNNING HANDLER [docker : Restart docker] **************************************
+changed: [iacgenie-server] => changed=true 
+  name: docker
+  state: started
+  status:
+    ActiveEnterTimestamp: Sat 2026-08-01 10:54:56 UTC
+    ActiveEnterTimestampMonotonic: '74178792046'
+    ActiveExitTimestamp: Sat 2026-08-01 10:54:50 UTC
+    ActiveExitTimestampMonotonic: '74172884190'
+    ActiveState: active
+    After: firewalld.service nss-lookup.target time-set.target basic.target system.slice docker.socket containerd.service network-online.target systemd-journald.socket sysinit.target
+    AllowIsolate: 'no'
+    AssertResult: 'yes'
+    AssertTimestamp: Sat 2026-08-01 10:54:55 UTC
+    AssertTimestampMonotonic: '74177893358'
+    Before: lightserp.service multi-user.target iacgenie-docker-compose.service gitea-runner.service shutdown.target cloudflared-iacgenie.service
+    BlockIOAccounting: 'no'
+    BlockIOWeight: '[not set]'
+    BoundBy: cloudflared-iacgenie.service
+    CPUAccounting: 'yes'
+    CPUAffinityFromNUMA: 'no'
+    CPUQuotaPerSecUSec: infinity
+    CPUQuotaPeriodUSec: infinity
+    CPUSchedulingPolicy: '0'
+    CPUSchedulingPriority: '0'
+    CPUSchedulingResetOnFork: 'no'
+    CPUShares: '[not set]'
+    CPUUsageNSec: '1120701804000'
+    CPUWeight: '[not set]'
+    CacheDirectoryMode: '0755'
+    CanFreeze: 'yes'
+    CanIsolate: 'no'
+    CanReload: 'yes'
+    CanStart: 'yes'
+    CanStop: 'yes'
+    CapabilityBoundingSet: cap_chown cap_dac_override cap_dac_read_search cap_fowner cap_fsetid cap_kill cap_setgid cap_setuid cap_setpcap cap_linux_immutable cap_net_bind_service cap_net_broadcast cap_net_admin cap_net_raw cap_ipc_lock cap_ipc_owner cap_sys_module cap_sys_rawio cap_sys_chroot cap_sys_ptrace cap_sys_pacct cap_sys_admin cap_sys_boot cap_sys_nice cap_sys_resource cap_sys_time cap_sys_tty_config cap_mknod cap_lease cap_audit_write cap_audit_control cap_setfcap cap_mac_override cap_mac_admin cap_syslog cap_wake_alarm cap_block_suspend cap_audit_read cap_perfmon cap_bpf cap_checkpoint_restore
+    CleanResult: success
+    CollectMode: inactive
+    ConditionResult: 'yes'
+    ConditionTimestamp: Sat 2026-08-01 10:54:55 UTC
+    ConditionTimestampMonotonic: '74177893356'
+    ConfigurationDirectoryMode: '0755'
+    Conflicts: shutdown.target
+    ControlGroup: /system.slice/docker.service
+    ControlGroupId: '500185'
+    ControlPID: '0'
+    CoredumpFilter: '0x33'
+    CoredumpReceive: 'no'
+    DefaultDependencies: 'yes'
+    DefaultMemoryLow: '0'
+    DefaultMemoryMin: '0'
+    DefaultStartupMemoryLow: '0'
+    Delegate: 'yes'
+    DelegateControllers: cpu cpuset io memory pids
+    Description: Docker Application Container Engine
+    DevicePolicy: auto
+    Documentation: https://docs.docker.com
+    DynamicUser: 'no'
+    EffectiveCPUs: 0-7
+    EffectiveMemoryNodes: '0'
+    ExecMainCode: '0'
+    ExecMainExitTimestampMonotonic: '0'
+    ExecMainPID: '2134749'
+    ExecMainStartTimestamp: Sat 2026-08-01 10:54:55 UTC
+    ExecMainStartTimestampMonotonic: '74177900178'
+    ExecMainStatus: '0'
+    ExecReload: '{ path=/bin/kill ; argv[]=/bin/kill -s HUP $MAINPID ; ignore_errors=no ; start_time=[n/a] ; stop_time=[n/a] ; pid=0 ; code=(null) ; status=0/0 }'
+    ExecReloadEx: '{ path=/bin/kill ; argv[]=/bin/kill -s HUP $MAINPID ; flags= ; start_time=[n/a] ; stop_time=[n/a] ; pid=0 ; code=(null) ; status=0/0 }'
+    ExecStart: '{ path=/usr/bin/dockerd ; argv[]=/usr/bin/dockerd -H fd:// --containerd=/run/containerd/containerd.sock ; ignore_errors=no ; start_time=[Sat 2026-08-01 10:54:55 UTC] ; stop_time=[n/a] ; pid=2134749 ; code=(null) ; status=0/0 }'
+    ExecStartEx: '{ path=/usr/bin/dockerd ; argv[]=/usr/bin/dockerd -H fd:// --containerd=/run/containerd/containerd.sock ; flags= ; start_time=[Sat 2026-08-01 10:54:55 UTC] ; stop_time=[n/a] ; pid=2134749 ; code=(null) ; status=0/0 }'
+    ExitType: main
+    ExtensionImagePolicy: root=verity+signed+encrypted+unprotected+absent:usr=verity+signed+encrypted+unprotected+absent:home=encrypted+unprotected+absent:srv=encrypted+unprotected+absent:tmp=encrypted+unprotected+absent:var=encrypted+unprotected+absent
+    FailureAction: none
+    FileDescriptorStoreMax: '0'
+    FileDescriptorStorePreserve: restart
+    FinalKillSignal: '9'
+    FragmentPath: /usr/lib/systemd/system/docker.service
+    FreezerState: running
+    GID: '[not set]'
+    GuessMainPID: 'yes'
+    IOAccounting: 'no'
+    IOReadBytes: '[not set]'
+    IOReadOperations: '[not set]'
+    IOSchedulingClass: '2'
+    IOSchedulingPriority: '4'
+    IOWeight: '[not set]'
+    IOWriteBytes: '[not set]'
+    IOWriteOperations: '[not set]'
+    IPAccounting: 'no'
+    IPEgressBytes: '[no data]'
+    IPEgressPackets: '[no data]'
+    IPIngressBytes: '[no data]'
+    IPIngressPackets: '[no data]'
+    Id: docker.service
+    IgnoreOnIsolate: 'no'
+    IgnoreSIGPIPE: 'yes'
+    InactiveEnterTimestamp: Sat 2026-08-01 10:54:55 UTC
+    InactiveEnterTimestampMonotonic: '74177892428'
+    InactiveExitTimestamp: Sat 2026-08-01 10:54:55 UTC
+    InactiveExitTimestampMonotonic: '74177900445'
+    InvocationID: f30a3b9355914bf980be6dc0eedad803
+    JobRunningTimeoutUSec: infinity
+    JobTimeoutAction: none
+    JobTimeoutUSec: infinity
+    KeyringMode: private
+    KillMode: process
+    KillSignal: '15'
+    LimitAS: infinity
+    LimitASSoft: infinity
+    LimitCORE: infinity
+    LimitCORESoft: infinity
+    LimitCPU: infinity
+    LimitCPUSoft: infinity
+    LimitDATA: infinity
+    LimitDATASoft: infinity
+    LimitFSIZE: infinity
+    LimitFSIZESoft: infinity
+    LimitLOCKS: infinity
+    LimitLOCKSSoft: infinity
+    LimitMEMLOCK: '8388608'
+    LimitMEMLOCKSoft: '8388608'
+    LimitMSGQUEUE: '819200'
+    LimitMSGQUEUESoft: '819200'
+    LimitNICE: '0'
+    LimitNICESoft: '0'
+    LimitNOFILE: '524288'
+    LimitNOFILESoft: '1024'
+    LimitNPROC: infinity
+    LimitNPROCSoft: infinity
+    LimitRSS: infinity
+    LimitRSSSoft: infinity
+    LimitRTPRIO: '0'
+    LimitRTPRIOSoft: '0'
+    LimitRTTIME: infinity
+    LimitRTTIMESoft: infinity
+    LimitSIGPENDING: '56170'
+    LimitSIGPENDINGSoft: '56170'
+    LimitSTACK: infinity
+    LimitSTACKSoft: '8388608'
+    LoadState: loaded
+    LockPersonality: 'no'
+    LogLevelMax: '-1'
+    LogRateLimitBurst: '0'
+    LogRateLimitIntervalUSec: '0'
+    LogsDirectoryMode: '0755'
+    MainPID: '2134749'
+    ManagedOOMMemoryPressure: auto
+    ManagedOOMMemoryPressureLimit: '0'
+    ManagedOOMPreference: none
+    ManagedOOMSwap: auto
+    MemoryAccounting: 'yes'
+    MemoryAvailable: '12269481984'
+    MemoryCurrent: '3509088256'
+    MemoryDenyWriteExecute: 'no'
+    MemoryHigh: infinity
+    MemoryKSM: 'no'
+    MemoryLimit: infinity
+    MemoryLow: '0'
+    MemoryMax: infinity
+    MemoryMin: '0'
+    MemoryPeak: '3622879232'
+    MemoryPressureThresholdUSec: 200ms
+    MemoryPressureWatch: auto
+    MemorySwapCurrent: '0'
+    MemorySwapMax: infinity
+    MemorySwapPeak: '0'
+    MemoryZSwapCurrent: '0'
+    MemoryZSwapMax: infinity
+    MountAPIVFS: 'no'
+    MountImagePolicy: root=verity+signed+encrypted+unprotected+absent:usr=verity+signed+encrypted+unprotected+absent:home=encrypted+unprotected+absent:srv=encrypted+unprotected+absent:tmp=encrypted+unprotected+absent:var=encrypted+unprotected+absent
+    NFileDescriptorStore: '0'
+    NRestarts: '0'
+    NUMAPolicy: n/a
+    Names: docker.service
+    NeedDaemonReload: 'no'
+    Nice: '0'
+    NoNewPrivileges: 'no'
+    NonBlocking: 'no'
+    NotifyAccess: main
+    OOMPolicy: continue
+    OOMScoreAdjust: '-500'
+    OnFailureJobMode: replace
+    OnSuccessJobMode: fail
+    Perpetual: 'no'
+    PrivateDevices: 'no'
+    PrivateIPC: 'no'
+    PrivateMounts: 'no'
+    PrivateNetwork: 'no'
+    PrivateTmp: 'no'
+    PrivateUsers: 'no'
+    ProcSubset: all
+    ProtectClock: 'no'
+    ProtectControlGroups: 'no'
+    ProtectHome: 'no'
+    ProtectHostname: 'no'
+    ProtectKernelLogs: 'no'
+    ProtectKernelModules: 'no'
+    ProtectKernelTunables: 'no'
+    ProtectProc: default
+    ProtectSystem: 'no'
+    RefuseManualStart: 'no'
+    RefuseManualStop: 'no'
+    ReloadResult: success
+    ReloadSignal: '1'
+    RemainAfterExit: 'no'
+    RemoveIPC: 'no'
+    RequiredBy: lightserp.service iacgenie-docker-compose.service
+    Requires: sysinit.target system.slice docker.socket
+    Restart: always
+    RestartKillSignal: '15'
+    RestartMaxDelayUSec: infinity
+    RestartMode: normal
+    RestartSteps: '0'
+    RestartUSec: 2s
+    RestartUSecNext: 2s
+    RestrictNamespaces: 'no'
+    RestrictRealtime: 'no'
+    RestrictSUIDSGID: 'no'
+    Result: success
+    RootDirectoryStartOnly: 'no'
+    RootEphemeral: 'no'
+    RootImagePolicy: root=verity+signed+encrypted+unprotected+absent:usr=verity+signed+encrypted+unprotected+absent:home=encrypted+unprotected+absent:srv=encrypted+unprotected+absent:tmp=encrypted+unprotected+absent:var=encrypted+unprotected+absent
+    RuntimeDirectoryMode: '0755'
+    RuntimeDirectoryPreserve: 'no'
+    RuntimeMaxUSec: infinity
+    RuntimeRandomizedExtraUSec: '0'
+    SameProcessGroup: 'no'
+    SecureBits: '0'
+    SendSIGHUP: 'no'
+    SendSIGKILL: 'yes'
+    SetLoginEnvironment: 'no'
+    Slice: system.slice
+    StandardError: inherit
+    StandardInput: 'null'
+    StandardOutput: journal
+    StartLimitAction: none
+    StartLimitBurst: '3'
+    StartLimitIntervalUSec: 1min
+    StartupBlockIOWeight: '[not set]'
+    StartupCPUShares: '[not set]'
+    StartupCPUWeight: '[not set]'
+    StartupIOWeight: '[not set]'
+    StartupMemoryHigh: infinity
+    StartupMemoryLow: '0'
+    StartupMemoryMax: infinity
+    StartupMemorySwapMax: infinity
+    StartupMemoryZSwapMax: infinity
+    StateChangeTimestamp: Sat 2026-08-01 10:54:56 UTC
+    StateChangeTimestampMonotonic: '74178792046'
+    StateDirectoryMode: '0755'
+    StatusErrno: '0'
+    StopWhenUnneeded: 'no'
+    SubState: running
+    SuccessAction: none
+    SurviveFinalKillSignal: 'no'
+    SyslogFacility: '3'
+    SyslogLevel: '6'
+    SyslogLevelPrefix: 'yes'
+    SyslogPriority: '30'
+    SystemCallErrorNumber: '2147483646'
+    TTYReset: 'no'
+    TTYVHangup: 'no'
+    TTYVTDisallocate: 'no'
+    TasksAccounting: 'yes'
+    TasksCurrent: '155'
+    TasksMax: infinity
+    TimeoutAbortUSec: 1min 30s
+    TimeoutCleanUSec: infinity
+    TimeoutStartFailureMode: terminate
+    TimeoutStartUSec: infinity
+    TimeoutStopFailureMode: terminate
+    TimeoutStopUSec: 1min 30s
+    TimerSlackNSec: '50000'
+    Transient: 'no'
+    TriggeredBy: docker.socket
+    Type: notify
+    UID: '[not set]'
+    UMask: '0022'
+    UnitFilePreset: enabled
+    UnitFileState: enabled
+    UtmpMode: init
+    WantedBy: gitea-runner.service multi-user.target cloudflared-iacgenie.service
+    Wants: containerd.service network-online.target
+    WatchdogSignal: '6'
+    WatchdogTimestampMonotonic: '0'
+    WatchdogUSec: '0'
+
+PLAY [all] *********************************************************************
+
+TASK [Gathering Facts] *********************************************************
+ok: [iacgenie-server]
+
+TASK [docker-compose-generator : Compose Gen | Create Docker network] **********
+changed: [iacgenie-server] => changed=true 
+  actions:
+  - Created network iacgenie-network with driver bridge
+  network: null
+
+TASK [docker-compose-generator : Compose Gen | Render docker-compose.yml template] ***
+--- before
++++ after: /Users/manjunathkanavi/.ansible/tmp/ansible-local-2355vh91a0uo/tmptn8qjfsa/docker-compose.yml.j2
+@@ -0,0 +1,335 @@
++# IacGenie Unified Infrastructure
++# Generated by Ansible — do not edit manually
++# Usage: cd /home/mkanavi/iacgenie-unified-infra && docker compose up -d
++---
++services:
++  # =====================
++  # PostgreSQL 15
++  # =====================
++  postgres:
++    image: postgres:15-alpine
++    container_name: iacgenie_postgres
++    restart: unless-stopped
++    environment:
++      POSTGRES_USER: lightsrp
++      POSTGRES_PASSWORD: "${PG_ROOT_PASSWORD}"
++      POSTGRES_DB: lightsrp
++    volumes:
++      - postgres_data:/var/lib/postgresql/data
++    ports:
++      - "127.0.0.1:5432:5432"
++    networks:
++      - "iacgenie-network"
++    healthcheck:
++      test: ["CMD-SHELL", "pg_isready -U lightsrp -d lightsrp"]
++      interval: 30s
++      timeout: 10s
++      retries: 3
++    deploy:
++      resources:
++        limits:
++          memory: "2g"
++
++  # =====================
++  # Redis 7
++  # =====================
++  redis:
++    image: redis:7-alpine
++    container_name: iacgenie_redis
++    restart: unless-stopped
++    command: redis-server --appendonly yes --maxmemory 2gb --maxmemory-policy allkeys-lru
++    volumes:
++      - redis_data:/data
++    ports:
++      - "127.0.0.1:6379:6379"
++    networks:
++      - "iacgenie-network"
++    healthcheck:
++      test: ["CMD", "redis-cli", "ping"]
++      interval: 30s
++      timeout: 10s
++      retries: 3
++    deploy:
++      resources:
++        limits:
++          memory: "512m"
++
++  # =====================
++  # MinIO
++  # =====================
++  minio:
++    image: minio/minio:latest
++    container_name: iacgenie_minio
++    restart: unless-stopped
++    command: server /data --console-address ":9001"
++    environment:
++      MINIO_ROOT_USER: "iacgenie"
++      MINIO_ROOT_PASSWORD: "${MINIO_ROOT_PASSWORD}"
++    volumes:
++      - minio_data:/data
++    ports:
++      - "127.0.0.1:9000:9000"
++      - "127.0.0.1:9001:9001"
++    networks:
++      - "iacgenie-network"
++    healthcheck:
++      test: ["CMD", "mc", "ready", "local"]
++      interval: 30s
++      timeout: 10s
++      retries: 3
++    deploy:
++      resources:
++        limits:
++          memory: "4g"
++
++  # =====================
++  # OpenBao 2.6.0
++  # =====================
++  openbao:
++    image: openbao/openbao:2.6.0
++    container_name: iacgenie_openbao
++    restart: unless-stopped
++    environment:
++      OPENBAO_ADDR: http://127.0.0.1:8200
++      OPENBAO_CLUSTER_ADDR: https://127.0.0.1:8201
++      OPENBAO_UI: "true"
++      OPENBAO_STORAGE_TYPE: raft
++      OPENBAO_STORAGE_PATH: /openbao/storage
++      OPENBAO_LOG_LEVEL: info
++    volumes:
++      - openbao_data:/openbao/storage
++      - openbao_raft:/openbao/raft
++      - /etc/letsencrypt:/etc/letsencrypt
++    ports:
++      - "127.0.0.1:8200:8200"
++      - "127.0.0.1:8201:8201"
++    networks:
++      - "iacgenie-network"
++    healthcheck:
++      test: ["CMD-SHELL", "curl -k -sf http://127.0.0.1:8200/v1/sys/health | python3 -c 'import sys,json; d=json.load(sys.stdin); assert d[\"sealed\"]==False or d[\"initialized\"]==True'"]
++      interval: 30s
++      timeout: 10s
++      retries: 3
++    deploy:
++      resources:
++        limits:
++          memory: "1g"
++
++  # =====================
++  # Keycloak 26.0
++  # =====================
++  keycloak:
++    image: quay.io/keycloak/keycloak:26.0
++    container_name: iacgenie_keycloak
++    restart: unless-stopped
++    command: start --hostname-keycloak --http-enabled=true --http-port=8080 --db=postgres --db-url-host=postgres --db-url-port=5432 --db-database=keycloak --db-username=keycloak --db-password="${KC_DB_PASSWORD}"
++    environment:
++      KC_BOOTSTRAP_ADMIN_USERNAME: "${KEYCLOAK_ADMIN_USER}"
++      KC_BOOTSTRAP_ADMIN_PASSWORD: "${KEYCLOAK_ADMIN_PASSWORD}"
++      KEYCLOAK_ADMIN: "${KEYCLOAK_ADMIN_USER}"
++      KEYCLOAK_ADMIN_PASSWORD: "${KEYCLOAK_ADMIN_PASSWORD}"
++      KC_DB: postgres
++      KC_DB_URL_HOST: postgres
++      KC_DB_URL_PORT: 5432
++      KC_DB_DATABASE: keycloak
++      KC_DB_USERNAME: keycloak
++      KC_DB_PASSWORD: "${KC_DB_PASSWORD}"
++      KC_HOSTNAME: auth.iacgenie.com
++      KC_PROXY: edge
++    volumes:
++      - keycloak_data:/opt/keycloak/data
++    ports:
++      - "127.0.0.1:8080:8080"
++    networks:
++      - "iacgenie-network"
++    depends_on:
++      - postgres
++    healthcheck:
++      test: ["CMD-SHELL", "curl -f http://127.0.0.1:8080/health/ready || exit 1"]
++      interval: 30s
++      timeout: 10s
++      retries: 3
++    deploy:
++      resources:
++        limits:
++          memory: "2g"
++
++  # =====================
++  # Gitea 1.23.4
++  # =====================
++  gitea:
++    image: gitea/gitea:1.23.4-rootless
++    container_name: iacgenie_gitea
++    restart: unless-stopped
++    environment:
++      USER: root
++      GITEA__database__DB_TYPE: postgres
++      GITEA__database__HOST: postgres:5432
++      GITEA__database__NAME: gitea
++      GITEA__database__USER: gitea
++      GITEA__database__PASSWORD: "${GITEA_DB_PASSWORD}"
++      GITEA__security__INSTALL_LOCK: "true"
++      GITEA__service__DISABLE_REGISTRATION: "false"
++      GITEA__service__REGISTER_EMAIL_CONFIRM: "false"
++      GITEA__service__ENABLE_NOTIFY_MAIL: "true"
++      GITEA__mailer__ENABLED: "true"
++      GITEA__mailer__SMTP_ADDR: "${SMTP_ADDR}"
++      GITEA__mailer__SMTP_PORT: "${SMTP_PORT}"
++      GITEA__mailer__USER: "${SMTP_USER}"
++      GITEA__mailer__PASSWD: "${SMTP_PASS}"
++      GITEA__mailer__FROM: "${SMTP_FROM}"
++    volumes:
++      - gitea_data:/var/lib/gitea
++      - gitea_data:/etc/gitea
++    ports:
++      - "127.0.0.1:3000:3000"
++      - "127.0.0.1:2222:2222"
++    networks:
++      - "iacgenie-network"
++    depends_on:
++      - postgres
++    healthcheck:
++      test: ["CMD", "curl", "-f", "http://127.0.0.1:3000/"]
++      interval: 30s
++      timeout: 10s
++      retries: 3
++    deploy:
++      resources:
++        limits:
++          memory: "1g"
++
++  # =====================
++  # LightSerp API
++  # =====================
++  lightserp-api:
++    image: mkanavi/lightserp-api:latest
++    container_name: iacgenie_lightserp_api
++    restart: unless-stopped
++    environment:
++      DATABASE_URL: "lightsrp@postgres:5432/lightsrp"
++      MINIO_ENDPOINT: "minio:9000"
++      MINIO_ACCESS_KEY: "${MINIO_ROOT_USER}"
++      MINIO_SECRET_KEY: "${MINIO_ROOT_PASSWORD}"
++      NSQD_ADDR: "nsqd:4150"
++      SEARXNG_URL: "http://searxng:8080"
++      LIGHTSERP_S3_BASE: "iacgenie-lightserp"
++      LIGHTSERP_ALLOW_INSECURE: "true"
++    ports:
++      - "127.0.0.1:8000:8000"
++    networks:
++      - "iacgenie-network"
++    depends_on:
++      - postgres
++      - minio
++      - nsqd
++      - searxng
++    deploy:
++      resources:
++        limits:
++          memory: "512m"
++
++  # =====================
++  # LightSerp WebUI
++  # =====================
++  lightserp-webui:
++    image: mkanavi/lightserp-webui:latest
++    container_name: iacgenie_lightserp_webui
++    restart: unless-stopped
++    ports:
++      - "127.0.0.1:3001:3001"
++    networks:
++      - "iacgenie-network"
++    depends_on:
++      - lightserp-api
++    deploy:
++      resources:
++        limits:
++          memory: "512m"
++
++  # =====================
++  # SearXNG
++  # =====================
++  searxng:
++    image: searxng/searxng:latest
++    container_name: iacgenie_searxng
++    restart: unless-stopped
++    environment:
++      SEARXNG_SECRET: "${SEARXNG_SECRET_KEY}"
++      SEARXNG_BASE_URL: "http://search.iacgenie.com"
++    ports:
++      - "127.0.0.1:8080:8080"
++    networks:
++      - "iacgenie-network"
++    deploy:
++      resources:
++        limits:
++          memory: "512m"
++
++  # =====================
++  # NSQD
++  # =====================
++  nsqd:
++    image: nsqio/nsq:latest
++    container_name: iacgenie_nsqd
++    restart: unless-stopped
++    command: nsqd --tcp-address=0.0.0.0 --http-address=0.0.0.0 --data-path=/nsq/data
++    volumes:
++      - nsqd_data:/nsq/data
++    ports:
++      - "127.0.0.1:4150:4150"
++      - "127.0.0.1:4151:4151"
++    networks:
++      - "iacgenie-network"
++    deploy:
++      resources:
++        limits:
++          memory: "256m"
++
++  # =====================
++  # PageZen
++  # =====================
++  pagezen:
++    image: mkanavi/pagezen:latest
++    container_name: iacgenie_pagezen
++    restart: unless-stopped
++    environment:
++      LIGHTSERP_API_URL: "http://lightserp-api:8000"
++      LIGHTSERP_API_SECRET: "${LIGHTSERP_API_SECRET}"
++    ports:
++      - "127.0.0.1:8081:8081"
++    networks:
++      - "iacgenie-network"
++    depends_on:
++      - lightserp-api
++    deploy:
++      resources:
++        limits:
++          memory: "512m"
++
++# Volumes
++volumes:
++  postgres_data:
++    driver: local
++  redis_data:
++    driver: local
++  minio_data:
++    driver: local
++  openbao_data:
++    driver: local
++  openbao_raft:
++    driver: local
++  keycloak_data:
++    driver: local
++  gitea_data:
++    driver: local
++  nsqd_data:
++    driver: local
++
++# Networks
++networks:
++  "iacgenie-network":
++    external: false
++    driver: bridge
++    ipam:
++      config:
++        - subnet: "172.28.0.0/16"
+
+changed: [iacgenie-server] => changed=true
+
+TASK [docker-compose-generator : Compose Gen | Verify compose file syntax] *****
+skipping: [iacgenie-server] => changed=false 
+  cmd:
+  - docker
+  - compose
+  - -f
+  - /home/mkanavi/iacgenie-unified-infra/docker-compose.yml
+  - config
+  - --quiet
+  delta: null
+  end: null
+  msg: Command would have run if not in check mode
+  rc: 0
+  start: null
+  stderr: ''
+  stderr_lines: <omitted>
+  stdout: ''
+  stdout_lines: <omitted>
+
+TASK [docker-compose-generator : Compose Gen | Show compose file location] *****
+ok: [iacgenie-server] => 
+  msg: docker-compose.yml deployed to /home/mkanavi/iacgenie-unified-infra/
+
+TASK [docker-compose-generator : Compose Gen | Check if containers are running] ***
+skipping: [iacgenie-server] => changed=false 
+  cmd:
+  - docker
+  - compose
+  - -p
+  - iacgenie
+  - ps
+  - --format
+  - json
+  delta: null
+  end: null
+  msg: Command would have run if not in check mode
+  rc: 0
+  start: null
+  stderr: ''
+  stderr_lines: <omitted>
+  stdout: ''
+  stdout_lines: <omitted>
+
+TASK [docker-compose-generator : Compose Gen | Deploy if compose file changed] ***
+skipping: [iacgenie-server] => changed=false 
+  false_condition: compose_changed | default(false) | bool
+  skip_reason: Conditional result was False
+
+TASK [docker-compose-generator : Compose Gen | Show deployment summary] ********
+ok: [iacgenie-server] => 
+  msg: 'Docker compose deployment complete. Verify with: docker compose ps'
+
+TASK [postgresql : PostgreSQL | Create data directory] *************************
+[WARNING]: failed to look up user postgres. Create user up to this point in real play
+[WARNING]: failed to look up group postgres. Create group up to this point in real play
+changed: [iacgenie-server] => changed=true 
+  path: /var/lib/postgresql/data
+
+TASK [postgresql : PostgreSQL | Deploy PostgreSQL configuration] ***************
+--- before
++++ after: /Users/manjunathkanavi/.ansible/tmp/ansible-local-2355vh91a0uo/tmpoqc99n5m/postgresql.conf.j2
+@@ -0,0 +1,36 @@
++# PostgreSQL 15 configuration
++# Managed by Ansible
++listen_addresses = '127.0.0.1'
++port = 5432
++max_connections = 200
++
++# Memory settings
++shared_buffers = 256MB
++effective_cache_size = 1GB
++work_mem = 4MB
++maintenance_work_mem = 128MB
++
++# WAL settings
++wal_level = replica
++max_wal_size = 1GB
++min_wal_size = 80MB
++
++# Logging
++logging_collector = on
++log_directory = 'log'
++log_filename = 'postgresql-%Y-%m-%d.log'
++log_min_duration_statement = 1000
++log_checkpoints = on
++log_connections = on
++log_disconnections = on
++log_lock_waits = on
++log_temp_files = 0
++
++# Autovacuum
++autovacuum = on
++autovacuum_max_workers = 2
++autovacuum_naptime = 60
++
++# Data directory
++data_directory = '/var/lib/postgresql/data'
++hba_file = '/var/lib/postgresql/data/pg_hba.conf'
+
+changed: [iacgenie-server] => changed=true
+
+TASK [postgresql : PostgreSQL | Deploy pg_hba.conf] ****************************
+--- before
++++ after: /Users/manjunathkanavi/.ansible/tmp/ansible-local-2355vh91a0uo/tmprc2c4osc/pg_hba.conf.j2
+@@ -0,0 +1,6 @@
++# PostgreSQL client authentication configuration
++# Managed by Ansible
++# TYPE  DATABASE        USER            ADDRESS                 METHOD
++local   all             all                                     peer
++host    all             all             127.0.0.1/32            scram-sha-256
++host    all             all             ::1/128                 scram-sha-256
+
+changed: [iacgenie-server] => changed=true
+
+TASK [postgresql : PostgreSQL | Deploy environment file] ***********************
+--- before
++++ after: /Users/manjunathkanavi/.ansible/tmp/ansible-local-2355vh91a0uo/tmp1potqo6g/.env.j2
+@@ -0,0 +1,5 @@
++# PostgreSQL Environment Variables
++# Managed by Ansible
++PG_ROOT_PASSWORD=CHANGE_ME_IN_VAULT
++PG_DATA_DIR=/var/lib/postgresql/data
++PG_PORT=5432
+
+changed: [iacgenie-server] => changed=true
+
+TASK [postgresql : PostgreSQL | Verify PostgreSQL is running] ******************
+skipping: [iacgenie-server] => changed=false 
+  cmd:
+  - docker
+  - compose
+  - -p
+  - iacgenie
+  - ps
+  - postgres
+  delta: null
+  end: null
+  msg: Command would have run if not in check mode
+  rc: 0
+  start: null
+  stderr: ''
+  stderr_lines: <omitted>
+  stdout: ''
+  stdout_lines: <omitted>
+
+TASK [postgresql : PostgreSQL | Show PostgreSQL status] ************************
+ok: [iacgenie-server] => 
+  pg_status.stdout: ''
+
+TASK [redis : Redis | Create data directory] ***********************************
+[WARNING]: failed to look up user redis. Create user up to this point in real play
+[WARNING]: failed to look up group redis. Create group up to this point in real play
+changed: [iacgenie-server] => changed=true 
+  path: /var/lib/redis
+
+TASK [redis : Redis | Deploy Redis configuration] ******************************
+--- before
++++ after: /Users/manjunathkanavi/.ansible/tmp/ansible-local-2355vh91a0uo/tmp7x6dbz8e/redis.conf.j2
+@@ -0,0 +1,18 @@
++# Redis 7 configuration
++# Managed by Ansible
++port 6379
++bind 127.0.0.1
++maxmemory 2gb
++maxmemory-policy allkeys-lru
++appendonly yes
++appendfilename "appendonly.aof"
++dir /var/lib/redis
++save 900 1
++save 300 10
++save 60 10000
++protected-mode yes
++tcp-backlog 511
++timeout 0
++tcp-keepalive 300
++loglevel notice
++databases 16
+
+changed: [iacgenie-server] => changed=true
+
+TASK [redis : Redis | Deploy environment file] *********************************
+--- before
++++ after: /Users/manjunathkanavi/.ansible/tmp/ansible-local-2355vh91a0uo/tmp2cu9dsyq/.env.j2
+@@ -0,0 +1,4 @@
++# Redis Environment Variables
++# Managed by Ansible
++REDIS_PASSWORD=*** redis_password | default('CHANGE_ME_IN_VAULT') }}
++REDIS_DATA_DIR=/var/lib/redis
+
+changed: [iacgenie-server] => changed=true
+
+TASK [redis : Redis | Verify Redis is running] *********************************
+skipping: [iacgenie-server] => changed=false 
+  cmd:
+  - docker
+  - compose
+  - -p
+  - iacgenie
+  - ps
+  - redis
+  delta: null
+  end: null
+  msg: Command would have run if not in check mode
+  rc: 0
+  start: null
+  stderr: ''
+  stderr_lines: <omitted>
+  stdout: ''
+  stdout_lines: <omitted>
+
+TASK [redis : Redis | Show Redis status] ***************************************
+ok: [iacgenie-server] => 
+  redis_status.stdout: ''
+
+TASK [minio : MinIO | Create data directory] ***********************************
+changed: [iacgenie-server] => changed=true 
+  path: /var/lib/minio
+
+TASK [minio : MinIO | Deploy environment file] *********************************
+--- before
++++ after: /Users/manjunathkanavi/.ansible/tmp/ansible-local-2355vh91a0uo/tmpb18bs8fy/.env.j2
+@@ -0,0 +1,5 @@
++# MinIO Environment Variables
++# Managed by Ansible
++MINIO_ROOT_USER=iacgenie
++MINIO_ROOT_PASSWORD=*** minio_root_password | default('CHANGE_ME_IN_VAULT') }}
++MINIO_DATA_DIR=/var/lib/minio
+
+changed: [iacgenie-server] => changed=true
+
+TASK [minio : MinIO | Verify MinIO is running] *********************************
+skipping: [iacgenie-server] => changed=false 
+  cmd:
+  - docker
+  - compose
+  - -p
+  - iacgenie
+  - ps
+  - minio
+  delta: null
+  end: null
+  msg: Command would have run if not in check mode
+  rc: 0
+  start: null
+  stderr: ''
+  stderr_lines: <omitted>
+  stdout: ''
+  stdout_lines: <omitted>
+
+TASK [minio : MinIO | Show MinIO status] ***************************************
+ok: [iacgenie-server] => 
+  minio_status.stdout: ''
+
+TASK [openbao : OpenBao | Create data directory] *******************************
+changed: [iacgenie-server] => changed=true 
+  path: /var/lib/openbao
+
+TASK [openbao : OpenBao | Deploy environment file] *****************************
+--- before
++++ after: /Users/manjunathkanavi/.ansible/tmp/ansible-local-2355vh91a0uo/tmp0o0rhtr5/.env.j2
+@@ -0,0 +1,6 @@
++# OpenBao Environment Variables
++# Managed by Ansible
++OPENBAO_ROOT_TOKEN=*** openbao_root_token | default('CHANGE_ME_IN_VAULT') }}
++OPENBAO_DATA_DIR=/var/lib/openbao
++OPENBAO_STORAGE_TYPE=file
++OPENBAO_AUTO_UNSEAL=False
+
+changed: [iacgenie-server] => changed=true
+
+TASK [openbao : OpenBao | Verify OpenBao is running] ***************************
+skipping: [iacgenie-server] => changed=false 
+  cmd:
+  - docker
+  - compose
+  - -p
+  - iacgenie
+  - ps
+  - openbao
+  delta: null
+  end: null
+  msg: Command would have run if not in check mode
+  rc: 0
+  start: null
+  stderr: ''
+  stderr_lines: <omitted>
+  stdout: ''
+  stdout_lines: <omitted>
+
+TASK [openbao : OpenBao | Show OpenBao status] *********************************
+ok: [iacgenie-server] => 
+  openbao_status.stdout: ''
+
+TASK [keycloak : Keycloak | Create data directory] *****************************
+changed: [iacgenie-server] => changed=true 
+  path: /var/lib/keycloak
+
+TASK [keycloak : Keycloak | Deploy environment file] ***************************
+--- before
++++ after: /Users/manjunathkanavi/.ansible/tmp/ansible-local-2355vh91a0uo/tmp27c657kq/.env.j2
+@@ -0,0 +1,8 @@
++# Keycloak Environment Variables
++# Managed by Ansible
++KEYCLOAK_ADMIN_USER=admin
++KEYCLOAK_ADMIN_PASSWORD=*** keycloak_admin_password | default('CHANGE_ME_IN_VAULT') }}
++KC_DB_PASSWORD=*** keycloak_db_password | default('CHANGE_ME_IN_VAULT') }}
++KC_DB_HOST=127.0.0.1
++KC_DB_PORT=5432
++KC_DB_NAME=keycloak
+
+changed: [iacgenie-server] => changed=true
+
+TASK [keycloak : Keycloak | Verify Keycloak is running] ************************
+skipping: [iacgenie-server] => changed=false 
+  cmd:
+  - docker
+  - compose
+  - -p
+  - iacgenie
+  - ps
+  - keycloak
+  delta: null
+  end: null
+  msg: Command would have run if not in check mode
+  rc: 0
+  start: null
+  stderr: ''
+  stderr_lines: <omitted>
+  stdout: ''
+  stdout_lines: <omitted>
+
+TASK [keycloak : Keycloak | Show Keycloak status] ******************************
+ok: [iacgenie-server] => 
+  keycloak_status.stdout: ''
+
+TASK [gitea : Gitea | Create data directory] ***********************************
+changed: [iacgenie-server] => changed=true 
+  path: /var/lib/gitea
+
+TASK [gitea : Gitea | Deploy environment file] *********************************
+--- before
++++ after: /Users/manjunathkanavi/.ansible/tmp/ansible-local-2355vh91a0uo/tmp_4vnqziv/.env.j2
+@@ -0,0 +1,13 @@
++# Gitea Environment Variables
++# Managed by Ansible
++GITEA_ADMIN_USERNAME=admin
++GITEA_ADMIN_PASSWORD=*** gitea_admin_password | default('CHANGE_ME_IN_VAULT') }}
++GITEA_DB_PASSWORD=*** gitea_db_password | default('CHANGE_ME_IN_VAULT') }}
++GITEA_DB_HOST=127.0.0.1
++GITEA_DB_PORT=5432
++GITEA_DB_NAME=gitea
++SMTP_ADDR=mail.smtp2go.com
++SMTP_PORT=2525
++SMTP_USER=CHANGE_ME_IN_VAULT
++SMTP_PASS=CHANGE_ME_IN_VAULT
++SMTP_FROM=noreply@iacgenie.com
+
+changed: [iacgenie-server] => changed=true
+
+TASK [gitea : Gitea | Verify Gitea is running] *********************************
+skipping: [iacgenie-server] => changed=false 
+  cmd:
+  - docker
+  - compose
+  - -p
+  - iacgenie
+  - ps
+  - gitea
+  delta: null
+  end: null
+  msg: Command would have run if not in check mode
+  rc: 0
+  start: null
+  stderr: ''
+  stderr_lines: <omitted>
+  stdout: ''
+  stdout_lines: <omitted>
+
+TASK [gitea : Gitea | Show Gitea status] ***************************************
+ok: [iacgenie-server] => 
+  gitea_status.stdout: ''
+
+TASK [lightserp : LightSerp | Create config directory] *************************
+changed: [iacgenie-server] => changed=true 
+  path: /home/mkanavi/iacgenie-unified-infra/lightserp
+
+TASK [lightserp : LightSerp | Deploy environment file] *************************
+--- before
++++ after: /Users/manjunathkanavi/.ansible/tmp/ansible-local-2355vh91a0uo/tmpqbcy70yi/.env.j2
+@@ -0,0 +1,9 @@
++# LightSerp Environment Variables
++# Managed by Ansible
++DATABASE_URL=lightsrp@postgres:5432/lightsrp
++MINIO_ENDPOINT=127.0.0.1:9000
++MINIO_ACCESS_KEY=iacgenie
++MINIO_SECRET_KEY=*** minio_root_password | default('CHANGE_ME_IN_VAULT') }}
++NSQD_ADDR=127.0.0.1:4150
++SearXNG_URL=http://searxng:8080
++LIGHTSERP_API_SECRET=*** lightserp_api_secret | default('CHANGE_ME_IN_VAULT') }}
+
+changed: [iacgenie-server] => changed=true
+
+TASK [lightserp : LightSerp | Verify LightSerp is running] *********************
+skipping: [iacgenie-server] => changed=false 
+  cmd:
+  - docker
+  - compose
+  - -p
+  - iacgenie
+  - ps
+  - lightserp-api
+  - lightserp-webui
+  delta: null
+  end: null
+  msg: Command would have run if not in check mode
+  rc: 0
+  start: null
+  stderr: ''
+  stderr_lines: <omitted>
+  stdout: ''
+  stdout_lines: <omitted>
+
+TASK [lightserp : LightSerp | Show LightSerp status] ***************************
+ok: [iacgenie-server] => 
+  lightserp_status.stdout: ''
+
+TASK [searxng : SearXNG | Deploy environment file] *****************************
+--- before
++++ after: /Users/manjunathkanavi/.ansible/tmp/ansible-local-2355vh91a0uo/tmp6dnnd_mp/.env.j2
+@@ -0,0 +1,3 @@
++# SearXNG Environment Variables
++SEARXNG_SECRET=*** searxng_secret | default('CHANGE_ME_IN_VAULT') }}
++SEARXNG_PORT=8080
+
+changed: [iacgenie-server] => changed=true
+
+TASK [searxng : SearXNG | Verify SearXNG is running] ***************************
+skipping: [iacgenie-server] => changed=false 
+  cmd:
+  - docker
+  - compose
+  - -p
+  - iacgenie
+  - ps
+  - searxng
+  delta: null
+  end: null
+  msg: Command would have run if not in check mode
+  rc: 0
+  start: null
+  stderr: ''
+  stderr_lines: <omitted>
+  stdout: ''
+  stdout_lines: <omitted>
+
+TASK [searxng : SearXNG | Show SearXNG status] *********************************
+ok: [iacgenie-server] => 
+  searxng_status.stdout: ''
+
+TASK [nsqd : NSQD | Deploy environment file] ***********************************
+--- before
++++ after: /Users/manjunathkanavi/.ansible/tmp/ansible-local-2355vh91a0uo/tmp24dtsc9t/.env.j2
+@@ -0,0 +1,4 @@
++# NSQD Environment Variables
++NSQD_DATA_PATH=/nsq/data
++NSQD_TCP_PORT=4150
++NSQD_HTTP_PORT=4151
+
+changed: [iacgenie-server] => changed=true
+
+TASK [nsqd : NSQD | Verify NSQD is running] ************************************
+skipping: [iacgenie-server] => changed=false 
+  cmd:
+  - docker
+  - compose
+  - -p
+  - iacgenie
+  - ps
+  - nsqd
+  delta: null
+  end: null
+  msg: Command would have run if not in check mode
+  rc: 0
+  start: null
+  stderr: ''
+  stderr_lines: <omitted>
+  stdout: ''
+  stdout_lines: <omitted>
+
+TASK [nsqd : NSQD | Show NSQD status] ******************************************
+ok: [iacgenie-server] => 
+  nsqd_status.stdout: ''
+
+TASK [pagezen : PageZen | Deploy environment file] *****************************
+--- before
++++ after: /Users/manjunathkanavi/.ansible/tmp/ansible-local-2355vh91a0uo/tmp00vpyhvw/.env.j2
+@@ -0,0 +1,4 @@
++# PageZen Environment Variables
++LIGHTSERP_API_URL=http://lightserp-api:8000
++LIGHTSERP_API_SECRET=*** lightserp_api_secret | default('CHANGE_ME_IN_VAULT') }}
++PAGEZEN_PORT=8081
+
+changed: [iacgenie-server] => changed=true
+
+TASK [pagezen : PageZen | Verify PageZen is running] ***************************
+skipping: [iacgenie-server] => changed=false 
+  cmd:
+  - docker
+  - compose
+  - -p
+  - iacgenie
+  - ps
+  - pagezen
+  delta: null
+  end: null
+  msg: Command would have run if not in check mode
+  rc: 0
+  start: null
+  stderr: ''
+  stderr_lines: <omitted>
+  stdout: ''
+  stdout_lines: <omitted>
+
+TASK [pagezen : PageZen | Show PageZen status] *********************************
+ok: [iacgenie-server] => 
+  pagezen_status.stdout: ''
+
+TASK [nginx : Nginx | Deploy Nginx configuration] ******************************
+--- before: /etc/nginx/nginx.conf
++++ after: /Users/manjunathkanavi/.ansible/tmp/ansible-local-2355vh91a0uo/tmpcrltzzvy/nginx.conf.j2
+@@ -1,83 +1,34 @@
++# Nginx configuration
++# Managed by Ansible
+ user www-data;
+ worker_processes auto;
++error_log /var/log/nginx/error.log warn;
+ pid /run/nginx.pid;
+-error_log /var/log/nginx/error.log;
+-include /etc/nginx/modules-enabled/*.conf;
+ 
+ events {
+-	worker_connections 768;
+-	# multi_accept on;
++    worker_connections 1024;
+ }
+ 
+ http {
++    include /etc/nginx/mime.types;
++    default_type application/octet-stream;
+ 
+-	##
+-	# Basic Settings
+-	##
++    log_format main '$remote_addr - $remote_user [$time_local] "$request" '
++                    '$status $body_bytes_sent "$http_referer" '
++                    '"$http_user_agent"';
+ 
+-	sendfile on;
+-	tcp_nopush on;
+-	types_hash_max_size 2048;
+-	# server_tokens off;
++    access_log /var/log/nginx/access.log main;
+ 
+-	# server_names_hash_bucket_size 64;
+-	# server_name_in_redirect off;
++    sendfile on;
++    tcp_nopush on;
++    keepalive_timeout 65;
++    client_max_body_size 64m;
+ 
+-	include /etc/nginx/mime.types;
+-	default_type application/octet-stream;
++    # Rate limiting
++    limit_req_zone $binary_remote_addr zone=api:10m rate=10r/s;
+ 
+-	##
+-	# SSL Settings
+-	##
++    listen 80;
++    listen 443;
+ 
+-	ssl_protocols TLSv1 TLSv1.1 TLSv1.2 TLSv1.3; # Dropping SSLv3, ref: POODLE
+-	ssl_prefer_server_ciphers on;
+-
+-	##
+-	# Logging Settings
+-	##
+-
+-	access_log /var/log/nginx/access.log;
+-
+-	##
+-	# Gzip Settings
+-	##
+-
+-	gzip on;
+-
+-	# gzip_vary on;
+-	# gzip_proxied any;
+-	# gzip_comp_level 6;
+-	# gzip_buffers 16 8k;
+-	# gzip_http_version 1.1;
+-	# gzip_types text/plain text/css application/json application/javascript text/xml application/xml application/xml+rss text/javascript;
+-
+-	##
+-	# Virtual Host Configs
+-	##
+-
+-	include /etc/nginx/conf.d/*.conf;
+-	include /etc/nginx/sites-enabled/*;
++    include /etc/nginx/conf.d/*.conf;
+ }
+-
+-
+-#mail {
+-#	# See sample authentication script at:
+-#	# http://wiki.nginx.org/ImapAuthenticateWithApachePhpScript
+-#
+-#	# auth_http localhost/auth.php;
+-#	# pop3_capabilities "TOP" "USER";
+-#	# imap_capabilities "IMAP4rev1" "UIDPLUS";
+-#
+-#	server {
+-#		listen     localhost:110;
+-#		protocol   pop3;
+-#		proxy      on;
+-#	}
+-#
+-#	server {
+-#		listen     localhost:143;
+-#		protocol   imap;
+-#		proxy      on;
+-#	}
+-#}
+
+changed: [iacgenie-server] => changed=true
+
+TASK [nginx : Nginx | Deploy reverse proxy configuration] **********************
+--- before
++++ after: /Users/manjunathkanavi/.ansible/tmp/ansible-local-2355vh91a0uo/tmp4ochlwtc/reverse-proxy.conf.j2
+@@ -0,0 +1,114 @@
++# Nginx reverse proxy for IacGenie services
++# Managed by Ansible
++
++map $http_upgrade $connection_upgrade {
++    default upgrade;
++    '' close;
++}
++
++server {
++    listen 80;
++    server_name _;
++    return 301 https://$host$request_uri;
++}
++
++server {
++    listen 443 ssl http2;
++    server_name auth.iacgenie.com;
++
++    ssl_certificate /etc/letsencrypt/live/auth.iacgenie.com/fullchain.pem;
++    ssl_certificate_key /etc/letsencrypt/live/auth.iacgenie.com/privkey.pem;
++
++    location / {
++        proxy_pass http://keycloak:8080;
++        proxy_set_header Host $host;
++        proxy_set_header X-Real-IP $remote_addr;
++        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
++        proxy_set_header X-Forwarded-Proto $scheme;
++    }
++}
++
++# SearXNG
++server {
++    listen 443 ssl http2;
++    server_name search.iacgenie.com;
++
++    ssl_certificate /etc/letsencrypt/live/search.iacgenie.com/fullchain.pem;
++    ssl_certificate_key /etc/letsencrypt/live/search.iacgenie.com/privkey.pem;
++
++    location / {
++        proxy_pass http://searxng:8080;
++        proxy_set_header Host $host;
++        proxy_set_header X-Real-IP $remote_addr;
++        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
++        proxy_set_header X-Forwarded-Proto $scheme;
++    }
++}
++
++# LightSerp API
++server {
++    listen 443 ssl http2;
++    server_name api.iacgenie.com;
++
++    ssl_certificate /etc/letsencrypt/live/api.iacgenie.com/fullchain.pem;
++    ssl_certificate_key /etc/letsencrypt/live/api.iacgenie.com/privkey.pem;
++
++    location / {
++        proxy_pass http://lightserp-api:8000;
++        proxy_set_header Host $host;
++        proxy_set_header X-Real-IP $remote_addr;
++        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
++        proxy_set_header X-Forwarded-Proto $scheme;
++    }
++}
++
++# LightSerp WebUI
++server {
++    listen 443 ssl http2;
++    server_name app.iacgenie.com;
++
++    ssl_certificate /etc/letsencrypt/live/app.iacgenie.com/fullchain.pem;
++    ssl_certificate_key /etc/letsencrypt/live/app.iacgenie.com/privkey.pem;
++
++    location / {
++        proxy_pass http://lightserp-webui:3001;
++        proxy_set_header Host $host;
++        proxy_set_header X-Real-IP $remote_addr;
++        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
++        proxy_set_header X-Forwarded-Proto $scheme;
++    }
++}
++
++# Gitea
++server {
++    listen 443 ssl http2;
++    server_name git.iacgenie.com;
++
++    ssl_certificate /etc/letsencrypt/live/git.iacgenie.com/fullchain.pem;
++    ssl_certificate_key /etc/letsencrypt/live/git.iacgenie.com/privkey.pem;
++
++    location / {
++        proxy_pass http://gitea:3000;
++        proxy_set_header Host $host;
++        proxy_set_header X-Real-IP $remote_addr;
++        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
++        proxy_set_header X-Forwarded-Proto $scheme;
++    }
++}
++
++# PageZen
++server {
++    listen 443 ssl http2;
++    server_name page.iacgenie.com;
++
++    ssl_certificate /etc/letsencrypt/live/page.iacgenie.com/fullchain.pem;
++    ssl_certificate_key /etc/letsencrypt/live/page.iacgenie.com/privkey.pem;
++
++    location / {
++        proxy_pass http://pagezen:8081;
++        proxy_set_header Host $host;
++        proxy_set_header X-Real-IP $remote_addr;
++        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
++        proxy_set_header X-Forwarded-Proto $scheme;
++    }
++}
+
+changed: [iacgenie-server] => changed=true
+
+TASK [nginx : Nginx | Verify Nginx is running] *********************************
+skipping: [iacgenie-server] => changed=false 
+  cmd:
+  - docker
+  - compose
+  - -p
+  - iacgenie
+  - ps
+  - nginx
+  delta: null
+  end: null
+  msg: Command would have run if not in check mode
+  rc: 0
+  start: null
+  stderr: ''
+  stderr_lines: <omitted>
+  stdout: ''
+  stdout_lines: <omitted>
+
+TASK [nginx : Nginx | Show Nginx status] ***************************************
+ok: [iacgenie-server] => 
+  nginx_status.stdout: ''
+
+TASK [cloudflare_tunnel : Cloudflare | Deploy Cloudflare Tunnel configuration] ***
+--- before
++++ after: /Users/manjunathkanavi/.ansible/tmp/ansible-local-2355vh91a0uo/tmpyqf0ch3u/cloudflared.yaml.j2
+@@ -0,0 +1,24 @@
++# Cloudflare Tunnel configuration
++# Managed by Ansible
++metrics: 0.0.0.0:12345
++no-autoupdate: true
++
++tunnels:
++  - name: iacgenie-tunnel
++    credentials-file: /etc/cloudflared/iacgenie-tunnel.json
++    gracePeriod: 30s
++
++    # Auto-create credentials
++    autoUpdateFrequency: 24h
++
++    # Edge routes
++    hostname: iacgenie.com
++    path: /
++    service: http://nginx:80
++
++    # Service rules for each domain
++    serviceRules:
++      - hostname: *.iacgenie.com
++        service: http://*:80
++      - hostname: iacgenie.com
++        service: http://iacgenie:80
+
+changed: [iacgenie-server] => changed=true
+
+TASK [cloudflare_tunnel : Cloudflare | Deploy Cloudflare Tunnel service file] ***
+--- before
++++ after: /Users/manjunathkanavi/.ansible/tmp/ansible-local-2355vh91a0uo/tmp1ozd3w27/cloudflared.service.j2
+@@ -0,0 +1,14 @@
++[Unit]
++Description=Cloudflare Tunnel
++After=network-online.target
++Wants=network-online.target
++
++[Service]
++Type=simple
++ExecStart=/usr/bin/cloudflared service uninstall
++ExecStart=/usr/bin/cloudflared --config /etc/cloudflared/config.yml tunnel --no-autoupdate run
++Restart=on-failure
++RestartSec=5
++
++[Install]
++WantedBy=multi-user.target
+
+changed: [iacgenie-server] => changed=true
+
+TASK [cloudflare_tunnel : Cloudflare | Enable and start Cloudflare Tunnel service] ***
+skipping: [iacgenie-server] => changed=false 
+  false_condition: ansible_facts.services is defined and (ansible_facts.services.get('cloudflared') is defined and ansible_facts.services.get('cloudflared').status != 'not-found')
+  skip_reason: Conditional result was False
+
+TASK [cloudflare_tunnel : Cloudflare | Verify Cloudflare Tunnel is running] ****
+skipping: [iacgenie-server] => changed=false 
+  cmd:
+  - docker
+  - compose
+  - -p
+  - iacgenie
+  - ps
+  - cloudflared
+  delta: null
+  end: null
+  msg: Command would have run if not in check mode
+  rc: 0
+  start: null
+  stderr: ''
+  stderr_lines: <omitted>
+  stdout: ''
+  stdout_lines: <omitted>
+
+TASK [cloudflare_tunnel : Cloudflare | Show Cloudflare status] *****************
+ok: [iacgenie-server] => 
+  cloudflared_status.stdout: ''
+
+RUNNING HANDLER [docker-compose-generator : Reload docker compose] *************
+skipping: [iacgenie-server] => changed=false 
+  cmd:
+  - docker
+  - compose
+  - -p
+  - iacgenie
+  - up
+  - -d
+  delta: null
+  end: null
+  msg: Command would have run if not in check mode
+  rc: 0
+  start: null
+  stderr: ''
+  stderr_lines: <omitted>
+  stdout: ''
+  stdout_lines: <omitted>
+
+RUNNING HANDLER [postgresql : Restart postgresql] ******************************
+skipping: [iacgenie-server] => changed=false 
+  cmd:
+  - docker
+  - compose
+  - -p
+  - iacgenie
+  - restart
+  - postgres
+  delta: null
+  end: null
+  msg: Command would have run if not in check mode
+  rc: 0
+  start: null
+  stderr: ''
+  stderr_lines: <omitted>
+  stdout: ''
+  stdout_lines: <omitted>
+
+RUNNING HANDLER [redis : Restart redis] ****************************************
+skipping: [iacgenie-server] => changed=false 
+  cmd:
+  - docker
+  - compose
+  - -p
+  - iacgenie
+  - restart
+  - redis
+  delta: null
+  end: null
+  msg: Command would have run if not in check mode
+  rc: 0
+  start: null
+  stderr: ''
+  stderr_lines: <omitted>
+  stdout: ''
+  stdout_lines: <omitted>
+
+RUNNING HANDLER [minio : Restart minio] ****************************************
+skipping: [iacgenie-server] => changed=false 
+  cmd:
+  - docker
+  - compose
+  - -p
+  - iacgenie
+  - restart
+  - minio
+  delta: null
+  end: null
+  msg: Command would have run if not in check mode
+  rc: 0
+  start: null
+  stderr: ''
+  stderr_lines: <omitted>
+  stdout: ''
+  stdout_lines: <omitted>
+
+RUNNING HANDLER [openbao : Restart openbao] ************************************
+skipping: [iacgenie-server] => changed=false 
+  cmd:
+  - docker
+  - compose
+  - -p
+  - iacgenie
+  - restart
+  - openbao
+  delta: null
+  end: null
+  msg: Command would have run if not in check mode
+  rc: 0
+  start: null
+  stderr: ''
+  stderr_lines: <omitted>
+  stdout: ''
+  stdout_lines: <omitted>
+
+RUNNING HANDLER [keycloak : Restart keycloak] **********************************
+skipping: [iacgenie-server] => changed=false 
+  cmd:
+  - docker
+  - compose
+  - -p
+  - iacgenie
+  - restart
+  - keycloak
+  delta: null
+  end: null
+  msg: Command would have run if not in check mode
+  rc: 0
+  start: null
+  stderr: ''
+  stderr_lines: <omitted>
+  stdout: ''
+  stdout_lines: <omitted>
+
+RUNNING HANDLER [gitea : Restart gitea] ****************************************
+skipping: [iacgenie-server] => changed=false 
+  cmd:
+  - docker
+  - compose
+  - -p
+  - iacgenie
+  - restart
+  - gitea
+  delta: null
+  end: null
+  msg: Command would have run if not in check mode
+  rc: 0
+  start: null
+  stderr: ''
+  stderr_lines: <omitted>
+  stdout: ''
+  stdout_lines: <omitted>
+
+RUNNING HANDLER [lightserp : Restart lightserp-api] ****************************
+skipping: [iacgenie-server] => changed=false 
+  cmd:
+  - docker
+  - compose
+  - -p
+  - iacgenie
+  - restart
+  - lightserp-api
+  delta: null
+  end: null
+  msg: Command would have run if not in check mode
+  rc: 0
+  start: null
+  stderr: ''
+  stderr_lines: <omitted>
+  stdout: ''
+  stdout_lines: <omitted>
+
+RUNNING HANDLER [searxng : Restart searxng] ************************************
+skipping: [iacgenie-server] => changed=false 
+  cmd:
+  - docker
+  - compose
+  - -p
+  - iacgenie
+  - restart
+  - searxng
+  delta: null
+  end: null
+  msg: Command would have run if not in check mode
+  rc: 0
+  start: null
+  stderr: ''
+  stderr_lines: <omitted>
+  stdout: ''
+  stdout_lines: <omitted>
+
+RUNNING HANDLER [nsqd : Restart nsqd] ******************************************
+skipping: [iacgenie-server] => changed=false 
+  cmd:
+  - docker
+  - compose
+  - -p
+  - iacgenie
+  - restart
+  - nsqd
+  delta: null
+  end: null
+  msg: Command would have run if not in check mode
+  rc: 0
+  start: null
+  stderr: ''
+  stderr_lines: <omitted>
+  stdout: ''
+  stdout_lines: <omitted>
+
+RUNNING HANDLER [pagezen : Restart pagezen] ************************************
+skipping: [iacgenie-server] => changed=false 
+  cmd:
+  - docker
+  - compose
+  - -p
+  - iacgenie
+  - restart
+  - pagezen
+  delta: null
+  end: null
+  msg: Command would have run if not in check mode
+  rc: 0
+  start: null
+  stderr: ''
+  stderr_lines: <omitted>
+  stdout: ''
+  stdout_lines: <omitted>
+
+RUNNING HANDLER [nginx : Restart nginx] ****************************************
+skipping: [iacgenie-server] => changed=false 
+  cmd:
+  - docker
+  - compose
+  - -p
+  - iacgenie
+  - restart
+  - nginx
+  delta: null
+  end: null
+  msg: Command would have run if not in check mode
+  rc: 0
+  start: null
+  stderr: ''
+  stderr_lines: <omitted>
+  stdout: ''
+  stdout_lines: <omitted>
+
+RUNNING HANDLER [cloudflare_tunnel : Restart cloudflared] **********************
+skipping: [iacgenie-server] => changed=false 
+  cmd:
+  - docker
+  - compose
+  - -p
+  - iacgenie
+  - restart
+  - cloudflared
+  delta: null
+  end: null
+  msg: Command would have run if not in check mode
+  rc: 0
+  start: null
+  stderr: ''
+  stderr_lines: <omitted>
+  stdout: ''
+  stdout_lines: <omitted>
+
+PLAY RECAP *********************************************************************
+iacgenie-server            : ok=79   changed=33   unreachable=0    failed=0    skipped=34   rescued=0    ignored=0   
+

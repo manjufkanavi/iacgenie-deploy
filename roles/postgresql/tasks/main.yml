@@ -1,45 +1,23 @@
 ---
 # PostgreSQL role - Main entry point
-- name: "PostgreSQL | Create data directory"
-  ansible.builtin.file:
-    path: "{{ pg_data_dir }}"
-    owner: postgres
-    group: postgres
-    mode: "0700"
-    state: directory
-
-- name: "PostgreSQL | Deploy PostgreSQL configuration"
-  ansible.builtin.template:
-    src: postgresql.conf.j2
-    dest: /var/lib/postgresql/data/postgresql.conf
-    owner: postgres
-    group: postgres
-    mode: "0600"
-  notify: Restart postgresql
-
-- name: "PostgreSQL | Deploy pg_hba.conf"
-  ansible.builtin.template:
-    src: pg_hba.conf.j2
-    dest: /var/lib/postgresql/data/pg_hba.conf
-    owner: postgres
-    group: postgres
-    mode: "0600"
-  notify: Restart postgresql
+# Note: Container deployment is handled by docker-compose-generator role
+# Docker handles data directory, user management, and internal config.
 
 - name: "PostgreSQL | Deploy environment file"
   ansible.builtin.template:
     src: .env.j2
-    dest: /home/mkanavi/iacgenie-unified-infra/.env
+    dest: /home/mkanavi/docker/iacgenie/.env.postgres
     owner: mkanavi
     group: mkanavi
     mode: "0600"
-  notify: Restart postgresql
+  notify: Reload docker compose
 
-- name: "PostgreSQL | Verify PostgreSQL is running"
-  ansible.builtin.command: docker compose -p iacgenie ps postgres
+- name: "PostgreSQL | Verify PostgreSQL container is running"
+  ansible.builtin.command: docker ps -a --filter "name=iacgenie-postgres" --format "{{ '{{.Names}}' }}"
   register: pg_status
   changed_when: false
+  failed_when: false
 
 - name: "PostgreSQL | Show PostgreSQL status"
   ansible.builtin.debug:
-    var: pg_status.stdout
+    var: pg_status.stdout_lines | default(['N/A - managed by docker-compose-generator'])

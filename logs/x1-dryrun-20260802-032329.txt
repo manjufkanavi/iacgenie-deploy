@@ -1,0 +1,2 @@
+[ERROR]: the playbook: site.yml could not be found
+Using /Users/manjunathkanavi/projects/iacgenie-deploy/ansible.cfg as config file

@@ -6,5 +6,8 @@
 - name: "Compose Gen | Generate docker-compose.yml"
   ansible.builtin.import_tasks: compose.yml
 
+- name: "Compose Gen | Merge .env.* service files"
+  ansible.builtin.import_tasks: env-merge.yml
+
 - name: "Compose Gen | Deploy compose file to target"
   ansible.builtin.import_tasks: deploy.yml

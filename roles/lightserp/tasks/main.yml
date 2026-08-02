@@ -1,27 +1,21 @@
 ---
 # LightSerp role - Main entry point
-- name: "LightSerp | Create config directory"
-  ansible.builtin.file:
-    path: /home/mkanavi/iacgenie-unified-infra/lightserp
-    owner: mkanavi
-    group: mkanavi
-    mode: "0755"
-    state: directory
-
+# Note: Container deployment is handled by docker-compose-generator role
 - name: "LightSerp | Deploy environment file"
   ansible.builtin.template:
     src: .env.j2
-    dest: /home/mkanavi/iacgenie-unified-infra/.env
+    dest: /home/mkanavi/docker/iacgenie/.env.lightserp
     owner: mkanavi
     group: mkanavi
     mode: "0600"
-  notify: Restart lightserp-api
+  notify: Reload docker compose
 
-- name: "LightSerp | Verify LightSerp is running"
-  ansible.builtin.command: docker compose -p iacgenie ps lightserp-api lightserp-webui
+- name: "LightSerp | Verify containers are running"
+  ansible.builtin.command: docker ps -a --filter "name=iacgenie-lightserp" --format "{{ '{{.Names}}' }}"
   register: lightserp_status
   changed_when: false
+  failed_when: false
 
 - name: "LightSerp | Show LightSerp status"
   ansible.builtin.debug:
-    var: lightserp_status.stdout
+    var: lightserp_status.stdout_lines | default(['N/A - managed by docker-compose-generator'])

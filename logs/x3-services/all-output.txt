@@ -1,0 +1,52 @@
+2 # Docker Compose Generator role - Main entry point
+3 - name: "Compose Gen | Generate Docker network"
+4   ansible.builtin.import_tasks: network.yml
+    ^ column 3
+2 # PostgreSQL role - Main entry point
+3 - name: "PostgreSQL | Create data directory"
+4   ansible.builtin.file:
+    ^ column 3
+2 # Redis role - Main entry point
+3 - name: "Redis | Create data directory"
+4   ansible.builtin.file:
+    ^ column 3
+2 # MinIO role - Main entry point
+3 - name: "MinIO | Create data directory"
+4   ansible.builtin.file:
+    ^ column 3
+2 # OpenBao role - Main entry point
+3 - name: "OpenBao | Create data directory"
+4   ansible.builtin.file:
+    ^ column 3
+2 # Keycloak role - Main entry point
+3 - name: "Keycloak | Create data directory"
+4   ansible.builtin.file:
+    ^ column 3
+2 # Gitea role - Main entry point
+3 - name: "Gitea | Create data directory"
+4   ansible.builtin.file:
+    ^ column 3
+2 # LightSerp role - Main entry point
+3 - name: "LightSerp | Create config directory"
+4   ansible.builtin.file:
+    ^ column 3
+2 # SearXNG role - Main entry point
+3 - name: "SearXNG | Deploy environment file"
+4   ansible.builtin.template:
+    ^ column 3
+2 # NSQD role - Main entry point
+3 - name: "NSQD | Deploy environment file"
+4   ansible.builtin.template:
+    ^ column 3
+2 # PageZen role - Main entry point
+3 - name: "PageZen | Deploy environment file"
+4   ansible.builtin.template:
+    ^ column 3
+2 # Nginx role - Main entry point
+3 - name: "Nginx | Deploy Nginx configuration"
+4   ansible.builtin.template:
+    ^ column 3
+2 # Cloudflare Tunnel role - Main entry point
+3 - name: "Cloudflare | Deploy Cloudflare Tunnel configuration"
+4   ansible.builtin.template:
+    ^ column 3

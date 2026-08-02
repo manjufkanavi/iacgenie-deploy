@@ -1,0 +1,758 @@
+[WARNING]: Deprecation warnings can be disabled by setting `deprecation_warnings=False` in ansible.cfg.
+[DEPRECATION WARNING]: community.general.yaml has been deprecated. The plugin has been superseded by the option `result_format=yaml` in callback plugin ansible.builtin.default from ansible-core 2.13 onwards. This feature will be removed from collection 'community.general' version 12.0.0.
+Using /Users/manjunathkanavi/projects/iacgenie-deploy/ansible.cfg as config file
+
+PLAY [all] *********************************************************************
+
+TASK [Gathering Facts] *********************************************************
+ok: [iacgenie-server]
+
+TASK [Update apt cache] ********************************************************
+ok: [iacgenie-server] => changed=false 
+  cache_update_time: 1785580818
+  cache_updated: false
+
+TASK [common : Common | Update apt cache] **************************************
+ok: [iacgenie-server] => changed=false 
+  cache_update_time: 1785580818
+  cache_updated: false
+
+TASK [common : Common | Install common packages] *******************************
+ok: [iacgenie-server] => changed=false 
+  cache_update_time: 1785580818
+  cache_updated: false
+
+TASK [common : Common | Install fail2ban if enabled] ***************************
+ok: [iacgenie-server] => changed=false 
+  cache_update_time: 1785580818
+  cache_updated: false
+
+TASK [common : Common | Install ufw if enabled] ********************************
+ok: [iacgenie-server] => changed=false 
+  cache_update_time: 1785580818
+  cache_updated: false
+
+TASK [common : Common | Set timezone] ******************************************
+[WARNING]: Callback dispatch 'v2_on_file_diff' failed for plugin 'ansible_collections.community.general.plugins.callback.yaml': name 'AnsibleDumper' is not defined
+changed: [iacgenie-server] => changed=true 
+  msg: executed `/usr/bin/timedatectl set-timezone UTC`
+
+TASK [common : Common | Configure SSH hardening] *******************************
+ok: [iacgenie-server] => (item={'regexp': '^#?Port .+', 'line': 'Port 22'}) => changed=false 
+  ansible_loop_var: item
+  backup: ''
+  item:
+    line: Port 22
+    regexp: ^#?Port .+
+  msg: ''
+ok: [iacgenie-server] => (item={'regexp': '^#?PermitRootLogin .+', 'line': 'PermitRootLogin no'}) => changed=false 
+  ansible_loop_var: item
+  backup: ''
+  item:
+    line: PermitRootLogin no
+    regexp: ^#?PermitRootLogin .+
+  msg: ''
+ok: [iacgenie-server] => (item={'regexp': '^#?PasswordAuthentication .+', 'line': 'PasswordAuthentication no'}) => changed=false 
+  ansible_loop_var: item
+  backup: ''
+  item:
+    line: PasswordAuthentication no
+    regexp: ^#?PasswordAuthentication .+
+  msg: ''
+ok: [iacgenie-server] => (item={'regexp': '^#?X11Forwarding .+', 'line': 'X11Forwarding no'}) => changed=false 
+  ansible_loop_var: item
+  backup: ''
+  item:
+    line: X11Forwarding no
+    regexp: ^#?X11Forwarding .+
+  msg: ''
+ok: [iacgenie-server] => (item={'regexp': '^#?MaxAuthTries .+', 'line': 'MaxAuthTries 3'}) => changed=false 
+  ansible_loop_var: item
+  backup: ''
+  item:
+    line: MaxAuthTries 3
+    regexp: ^#?MaxAuthTries .+
+  msg: ''
+ok: [iacgenie-server] => (item={'regexp': '^#?LoginGraceTime .+', 'line': 'LoginGraceTime 60'}) => changed=false 
+  ansible_loop_var: item
+  backup: ''
+  item:
+    line: LoginGraceTime 60
+    regexp: ^#?LoginGraceTime .+
+  msg: ''
+
+TASK [common : Common | Enable UFW] ********************************************
+ok: [iacgenie-server] => changed=false 
+  commands:
+  - /usr/sbin/ufw status verbose
+  - /usr/bin/grep -h '^### tuple' /lib/ufw/user.rules /lib/ufw/user6.rules /etc/ufw/user.rules /etc/ufw/user6.rules /var/lib/ufw/user.rules /var/lib/ufw/user6.rules
+  - /usr/sbin/ufw -f enable
+  - /usr/sbin/ufw default deny
+  - /usr/sbin/ufw status verbose
+  - /usr/bin/grep -h '^### tuple' /lib/ufw/user.rules /lib/ufw/user6.rules /etc/ufw/user.rules /etc/ufw/user6.rules /var/lib/ufw/user.rules /var/lib/ufw/user6.rules
+  msg: |-
+    Status: active
+    Logging: on (low)
+    Default: deny (incoming), allow (outgoing), deny (routed)
+    New profiles: skip
+  
+    To                         Action      From
+    --                         ------      ----
+    22/tcp                     ALLOW IN    Anywhere
+    22/tcp (OpenSSH)           ALLOW IN    Anywhere
+    80/tcp                     ALLOW IN    Anywhere
+    443/tcp                    ALLOW IN    Anywhere
+    22/tcp (v6)                ALLOW IN    Anywhere (v6)
+    22/tcp (OpenSSH (v6))      ALLOW IN    Anywhere (v6)
+    80/tcp (v6)                ALLOW IN    Anywhere (v6)
+    443/tcp (v6)               ALLOW IN    Anywhere (v6)
+
+TASK [common : Common | Set UFW default policies] ******************************
+ok: [iacgenie-server] => (item={'direction': 'incoming', 'policy': 'deny'}) => changed=false 
+  ansible_loop_var: item
+  commands:
+  - /usr/sbin/ufw status verbose
+  - /usr/bin/grep -h '^### tuple' /lib/ufw/user.rules /lib/ufw/user6.rules /etc/ufw/user.rules /etc/ufw/user6.rules /var/lib/ufw/user.rules /var/lib/ufw/user6.rules
+  - /usr/sbin/ufw default deny incoming
+  - /usr/sbin/ufw status verbose
+  - /usr/bin/grep -h '^### tuple' /lib/ufw/user.rules /lib/ufw/user6.rules /etc/ufw/user.rules /etc/ufw/user6.rules /var/lib/ufw/user.rules /var/lib/ufw/user6.rules
+  item:
+    direction: incoming
+    policy: deny
+  msg: |-
+    Status: active
+    Logging: on (low)
+    Default: deny (incoming), allow (outgoing), deny (routed)
+    New profiles: skip
+  
+    To                         Action      From
+    --                         ------      ----
+    22/tcp                     ALLOW IN    Anywhere
+    22/tcp (OpenSSH)           ALLOW IN    Anywhere
+    80/tcp                     ALLOW IN    Anywhere
+    443/tcp                    ALLOW IN    Anywhere
+    22/tcp (v6)                ALLOW IN    Anywhere (v6)
+    22/tcp (OpenSSH (v6))      ALLOW IN    Anywhere (v6)
+    80/tcp (v6)                ALLOW IN    Anywhere (v6)
+    443/tcp (v6)               ALLOW IN    Anywhere (v6)
+ok: [iacgenie-server] => (item={'direction': 'outgoing', 'policy': 'allow'}) => changed=false 
+  ansible_loop_var: item
+  commands:
+  - /usr/sbin/ufw status verbose
+  - /usr/bin/grep -h '^### tuple' /lib/ufw/user.rules /lib/ufw/user6.rules /etc/ufw/user.rules /etc/ufw/user6.rules /var/lib/ufw/user.rules /var/lib/ufw/user6.rules
+  - /usr/sbin/ufw default allow outgoing
+  - /usr/sbin/ufw status verbose
+  - /usr/bin/grep -h '^### tuple' /lib/ufw/user.rules /lib/ufw/user6.rules /etc/ufw/user.rules /etc/ufw/user6.rules /var/lib/ufw/user.rules /var/lib/ufw/user6.rules
+  item:
+    direction: outgoing
+    policy: allow
+  msg: |-
+    Status: active
+    Logging: on (low)
+    Default: deny (incoming), allow (outgoing), deny (routed)
+    New profiles: skip
+  
+    To                         Action      From
+    --                         ------      ----
+    22/tcp                     ALLOW IN    Anywhere
+    22/tcp (OpenSSH)           ALLOW IN    Anywhere
+    80/tcp                     ALLOW IN    Anywhere
+    443/tcp                    ALLOW IN    Anywhere
+    22/tcp (v6)                ALLOW IN    Anywhere (v6)
+    22/tcp (OpenSSH (v6))      ALLOW IN    Anywhere (v6)
+    80/tcp (v6)                ALLOW IN    Anywhere (v6)
+    443/tcp (v6)               ALLOW IN    Anywhere (v6)
+
+TASK [common : Common | Add UFW rules for allowed ports] ***********************
+ok: [iacgenie-server] => (item=22/tcp) => changed=false 
+  ansible_loop_var: item
+  commands:
+  - /usr/sbin/ufw status verbose
+  - /usr/bin/grep -h '^### tuple' /lib/ufw/user.rules /lib/ufw/user6.rules /etc/ufw/user.rules /etc/ufw/user6.rules /var/lib/ufw/user.rules /var/lib/ufw/user6.rules
+  - /usr/sbin/ufw --version
+  - /usr/sbin/ufw allow from any to any port 22 proto tcp
+  - /usr/sbin/ufw status verbose
+  - /usr/bin/grep -h '^### tuple' /lib/ufw/user.rules /lib/ufw/user6.rules /etc/ufw/user.rules /etc/ufw/user6.rules /var/lib/ufw/user.rules /var/lib/ufw/user6.rules
+  item: 22/tcp
+  msg: |-
+    Status: active
+    Logging: on (low)
+    Default: deny (incoming), allow (outgoing), deny (routed)
+    New profiles: skip
+  
+    To                         Action      From
+    --                         ------      ----
+    22/tcp                     ALLOW IN    Anywhere
+    22/tcp (OpenSSH)           ALLOW IN    Anywhere
+    80/tcp                     ALLOW IN    Anywhere
+    443/tcp                    ALLOW IN    Anywhere
+    22/tcp (v6)                ALLOW IN    Anywhere (v6)
+    22/tcp (OpenSSH (v6))      ALLOW IN    Anywhere (v6)
+    80/tcp (v6)                ALLOW IN    Anywhere (v6)
+    443/tcp (v6)               ALLOW IN    Anywhere (v6)
+ok: [iacgenie-server] => (item=443/tcp) => changed=false 
+  ansible_loop_var: item
+  commands:
+  - /usr/sbin/ufw status verbose
+  - /usr/bin/grep -h '^### tuple' /lib/ufw/user.rules /lib/ufw/user6.rules /etc/ufw/user.rules /etc/ufw/user6.rules /var/lib/ufw/user.rules /var/lib/ufw/user6.rules
+  - /usr/sbin/ufw --version
+  - /usr/sbin/ufw allow from any to any port 443 proto tcp
+  - /usr/sbin/ufw status verbose
+  - /usr/bin/grep -h '^### tuple' /lib/ufw/user.rules /lib/ufw/user6.rules /etc/ufw/user.rules /etc/ufw/user6.rules /var/lib/ufw/user.rules /var/lib/ufw/user6.rules
+  item: 443/tcp
+  msg: |-
+    Status: active
+    Logging: on (low)
+    Default: deny (incoming), allow (outgoing), deny (routed)
+    New profiles: skip
+  
+    To                         Action      From
+    --                         ------      ----
+    22/tcp                     ALLOW IN    Anywhere
+    22/tcp (OpenSSH)           ALLOW IN    Anywhere
+    80/tcp                     ALLOW IN    Anywhere
+    443/tcp                    ALLOW IN    Anywhere
+    22/tcp (v6)                ALLOW IN    Anywhere (v6)
+    22/tcp (OpenSSH (v6))      ALLOW IN    Anywhere (v6)
+    80/tcp (v6)                ALLOW IN    Anywhere (v6)
+    443/tcp (v6)               ALLOW IN    Anywhere (v6)
+ok: [iacgenie-server] => (item=80/tcp) => changed=false 
+  ansible_loop_var: item
+  commands:
+  - /usr/sbin/ufw status verbose
+  - /usr/bin/grep -h '^### tuple' /lib/ufw/user.rules /lib/ufw/user6.rules /etc/ufw/user.rules /etc/ufw/user6.rules /var/lib/ufw/user.rules /var/lib/ufw/user6.rules
+  - /usr/sbin/ufw --version
+  - /usr/sbin/ufw allow from any to any port 80 proto tcp
+  - /usr/sbin/ufw status verbose
+  - /usr/bin/grep -h '^### tuple' /lib/ufw/user.rules /lib/ufw/user6.rules /etc/ufw/user.rules /etc/ufw/user6.rules /var/lib/ufw/user.rules /var/lib/ufw/user6.rules
+  item: 80/tcp
+  msg: |-
+    Status: active
+    Logging: on (low)
+    Default: deny (incoming), allow (outgoing), deny (routed)
+    New profiles: skip
+  
+    To                         Action      From
+    --                         ------      ----
+    22/tcp                     ALLOW IN    Anywhere
+    22/tcp (OpenSSH)           ALLOW IN    Anywhere
+    80/tcp                     ALLOW IN    Anywhere
+    443/tcp                    ALLOW IN    Anywhere
+    22/tcp (v6)                ALLOW IN    Anywhere (v6)
+    22/tcp (OpenSSH (v6))      ALLOW IN    Anywhere (v6)
+    80/tcp (v6)                ALLOW IN    Anywhere (v6)
+    443/tcp (v6)               ALLOW IN    Anywhere (v6)
+
+TASK [common : Common | Log UFW status] ****************************************
+ok: [iacgenie-server] => changed=false 
+  cmd:
+  - ufw
+  - status
+  - verbose
+  delta: '0:00:00.060042'
+  end: '2026-08-01 21:56:07.427280'
+  msg: ''
+  rc: 0
+  start: '2026-08-01 21:56:07.367238'
+  stderr: ''
+  stderr_lines: <omitted>
+  stdout: |-
+    Status: active
+    Logging: on (low)
+    Default: deny (incoming), allow (outgoing), deny (routed)
+    New profiles: skip
+  
+    To                         Action      From
+    --                         ------      ----
+    22/tcp                     ALLOW IN    Anywhere
+    22/tcp (OpenSSH)           ALLOW IN    Anywhere
+    80/tcp                     ALLOW IN    Anywhere
+    443/tcp                    ALLOW IN    Anywhere
+    22/tcp (v6)                ALLOW IN    Anywhere (v6)
+    22/tcp (OpenSSH (v6))      ALLOW IN    Anywhere (v6)
+    80/tcp (v6)                ALLOW IN    Anywhere (v6)
+    443/tcp (v6)               ALLOW IN    Anywhere (v6)
+  stdout_lines: <omitted>
+
+TASK [common : Common | Configure fail2ban for SSH] ****************************
+ok: [iacgenie-server] => changed=false 
+  checksum: edfb28bbc166f38efc4a55f27047fe7620e58f0e
+  dest: /etc/fail2ban/jail.local
+  gid: 0
+  group: root
+  mode: '0644'
+  owner: root
+  path: /etc/fail2ban/jail.local
+  size: 261
+  state: file
+  uid: 0
+
+TASK [common : Common | Enable and start fail2ban] *****************************
+ok: [iacgenie-server] => changed=false 
+  enabled: true
+  name: fail2ban
+  state: started
+  status:
+    ActiveEnterTimestamp: Fri 2026-07-31 14:18:39 UTC
+    ActiveEnterTimestampMonotonic: '4937132'
+    ActiveExitTimestampMonotonic: '0'
+    ActiveState: active
+    After: ip6tables.service -.mount systemd-journald.socket sysinit.target basic.target nftables.service iptables.service ipset.service firewalld.service system.slice network.target
+    AllowIsolate: 'no'
+    AssertResult: 'yes'
+    AssertTimestamp: Fri 2026-07-31 14:18:39 UTC
+    AssertTimestampMonotonic: '4935494'
+    Before: shutdown.target multi-user.target
+    BlockIOAccounting: 'no'
+    BlockIOWeight: '[not set]'
+    CPUAccounting: 'yes'
+    CPUAffinityFromNUMA: 'no'
+    CPUQuotaPerSecUSec: infinity
+    CPUQuotaPeriodUSec: infinity
+    CPUSchedulingPolicy: '0'
+    CPUSchedulingPriority: '0'
+    CPUSchedulingResetOnFork: 'no'
+    CPUShares: '[not set]'
+    CPUUsageNSec: '120740827000'
+    CPUWeight: '[not set]'
+    CacheDirectoryMode: '0755'
+    CanClean: runtime
+    CanFreeze: 'yes'
+    CanIsolate: 'no'
+    CanReload: 'yes'
+    CanStart: 'yes'
+    CanStop: 'yes'
+    CapabilityBoundingSet: cap_chown cap_dac_override cap_dac_read_search cap_fowner cap_fsetid cap_kill cap_setgid cap_setuid cap_setpcap cap_linux_immutable cap_net_bind_service cap_net_broadcast cap_net_admin cap_net_raw cap_ipc_lock cap_ipc_owner cap_sys_module cap_sys_rawio cap_sys_chroot cap_sys_ptrace cap_sys_pacct cap_sys_admin cap_sys_boot cap_sys_nice cap_sys_resource cap_sys_time cap_sys_tty_config cap_mknod cap_lease cap_audit_write cap_audit_control cap_setfcap cap_mac_override cap_mac_admin cap_syslog cap_wake_alarm cap_block_suspend cap_audit_read cap_perfmon cap_bpf cap_checkpoint_restore
+    CleanResult: success
+    CollectMode: inactive
+    ConditionResult: 'yes'
+    ConditionTimestamp: Fri 2026-07-31 14:18:39 UTC
+    ConditionTimestampMonotonic: '4935491'
+    ConfigurationDirectoryMode: '0755'
+    Conflicts: shutdown.target
+    ControlGroup: /system.slice/fail2ban.service
+    ControlGroupId: '5308'
+    ControlPID: '0'
+    CoredumpFilter: '0x33'
+    CoredumpReceive: 'no'
+    DefaultDependencies: 'yes'
+    DefaultMemoryLow: '0'
+    DefaultMemoryMin: '0'
+    DefaultStartupMemoryLow: '0'
+    Delegate: 'no'
+    Description: Fail2Ban Service
+    DevicePolicy: auto
+    Documentation: '"man:fail2ban(1)"'
+    DynamicUser: 'no'
+    EffectiveCPUs: 0-7
+    EffectiveMemoryNodes: '0'
+    Environment: PYTHONNOUSERSITE=yes
+    ExecMainCode: '0'
+    ExecMainExitTimestampMonotonic: '0'
+    ExecMainPID: '1038'
+    ExecMainStartTimestamp: Fri 2026-07-31 14:18:39 UTC
+    ExecMainStartTimestampMonotonic: '4936866'
+    ExecMainStatus: '0'
+    ExecReload: '{ path=/usr/bin/fail2ban-client ; argv[]=/usr/bin/fail2ban-client reload ; ignore_errors=no ; start_time=[n/a] ; stop_time=[n/a] ; pid=0 ; code=(null) ; status=0/0 }'
+    ExecReloadEx: '{ path=/usr/bin/fail2ban-client ; argv[]=/usr/bin/fail2ban-client reload ; flags= ; start_time=[n/a] ; stop_time=[n/a] ; pid=0 ; code=(null) ; status=0/0 }'
+    ExecStart: '{ path=/usr/bin/fail2ban-server ; argv[]=/usr/bin/fail2ban-server -xf start ; ignore_errors=no ; start_time=[n/a] ; stop_time=[n/a] ; pid=0 ; code=(null) ; status=0/0 }'
+    ExecStartEx: '{ path=/usr/bin/fail2ban-server ; argv[]=/usr/bin/fail2ban-server -xf start ; flags= ; start_time=[n/a] ; stop_time=[n/a] ; pid=0 ; code=(null) ; status=0/0 }'
+    ExecStop: '{ path=/usr/bin/fail2ban-client ; argv[]=/usr/bin/fail2ban-client stop ; ignore_errors=no ; start_time=[n/a] ; stop_time=[n/a] ; pid=0 ; code=(null) ; status=0/0 }'
+    ExecStopEx: '{ path=/usr/bin/fail2ban-client ; argv[]=/usr/bin/fail2ban-client stop ; flags= ; start_time=[n/a] ; stop_time=[n/a] ; pid=0 ; code=(null) ; status=0/0 }'
+    ExitType: main
+    ExtensionImagePolicy: root=verity+signed+encrypted+unprotected+absent:usr=verity+signed+encrypted+unprotected+absent:home=encrypted+unprotected+absent:srv=encrypted+unprotected+absent:tmp=encrypted+unprotected+absent:var=encrypted+unprotected+absent
+    FailureAction: none
+    FileDescriptorStoreMax: '0'
+    FileDescriptorStorePreserve: restart
+    FinalKillSignal: '9'
+    FragmentPath: /usr/lib/systemd/system/fail2ban.service
+    FreezerState: running
+    GID: '[not set]'
+    GuessMainPID: 'yes'
+    IOAccounting: 'no'
+    IOReadBytes: '[not set]'
+    IOReadOperations: '[not set]'
+    IOSchedulingClass: '2'
+    IOSchedulingPriority: '4'
+    IOWeight: '[not set]'
+    IOWriteBytes: '[not set]'
+    IOWriteOperations: '[not set]'
+    IPAccounting: 'no'
+    IPEgressBytes: '[no data]'
+    IPEgressPackets: '[no data]'
+    IPIngressBytes: '[no data]'
+    IPIngressPackets: '[no data]'
+    Id: fail2ban.service
+    IgnoreOnIsolate: 'no'
+    IgnoreSIGPIPE: 'yes'
+    InactiveEnterTimestampMonotonic: '0'
+    InactiveExitTimestamp: Fri 2026-07-31 14:18:39 UTC
+    InactiveExitTimestampMonotonic: '4937132'
+    InvocationID: 0b04a42e94c94594839b5120979e1440
+    JobRunningTimeoutUSec: infinity
+    JobTimeoutAction: none
+    JobTimeoutUSec: infinity
+    KeyringMode: private
+    KillMode: control-group
+    KillSignal: '15'
+    LimitAS: infinity
+    LimitASSoft: infinity
+    LimitCORE: infinity
+    LimitCORESoft: '0'
+    LimitCPU: infinity
+    LimitCPUSoft: infinity
+    LimitDATA: infinity
+    LimitDATASoft: infinity
+    LimitFSIZE: infinity
+    LimitFSIZESoft: infinity
+    LimitLOCKS: infinity
+    LimitLOCKSSoft: infinity
+    LimitMEMLOCK: '8388608'
+    LimitMEMLOCKSoft: '8388608'
+    LimitMSGQUEUE: '819200'
+    LimitMSGQUEUESoft: '819200'
+    LimitNICE: '0'
+    LimitNICESoft: '0'
+    LimitNOFILE: '524288'
+    LimitNOFILESoft: '1024'
+    LimitNPROC: '56170'
+    LimitNPROCSoft: '56170'
+    LimitRSS: infinity
+    LimitRSSSoft: infinity
+    LimitRTPRIO: '0'
+    LimitRTPRIOSoft: '0'
+    LimitRTTIME: infinity
+    LimitRTTIMESoft: infinity
+    LimitSIGPENDING: '56170'
+    LimitSIGPENDINGSoft: '56170'
+    LimitSTACK: infinity
+    LimitSTACKSoft: '8388608'
+    LoadState: loaded
+    LockPersonality: 'no'
+    LogLevelMax: '-1'
+    LogRateLimitBurst: '0'
+    LogRateLimitIntervalUSec: '0'
+    LogsDirectoryMode: '0755'
+    MainPID: '1038'
+    ManagedOOMMemoryPressure: auto
+    ManagedOOMMemoryPressureLimit: '0'
+    ManagedOOMPreference: none
+    ManagedOOMSwap: auto
+    MemoryAccounting: 'yes'
+    MemoryAvailable: '12316270592'
+    MemoryCurrent: '85803008'
+    MemoryDenyWriteExecute: 'no'
+    MemoryHigh: infinity
+    MemoryKSM: 'no'
+    MemoryLimit: infinity
+    MemoryLow: '0'
+    MemoryMax: infinity
+    MemoryMin: '0'
+    MemoryPeak: '93114368'
+    MemoryPressureThresholdUSec: 200ms
+    MemoryPressureWatch: auto
+    MemorySwapCurrent: '0'
+    MemorySwapMax: infinity
+    MemorySwapPeak: '0'
+    MemoryZSwapCurrent: '0'
+    MemoryZSwapMax: infinity
+    MountAPIVFS: 'no'
+    MountImagePolicy: root=verity+signed+encrypted+unprotected+absent:usr=verity+signed+encrypted+unprotected+absent:home=encrypted+unprotected+absent:srv=encrypted+unprotected+absent:tmp=encrypted+unprotected+absent:var=encrypted+unprotected+absent
+    NFileDescriptorStore: '0'
+    NRestarts: '0'
+    NUMAPolicy: n/a
+    Names: fail2ban.service
+    NeedDaemonReload: 'no'
+    Nice: '0'
+    NoNewPrivileges: 'no'
+    NonBlocking: 'no'
+    NotifyAccess: none
+    OOMPolicy: stop
+    OOMScoreAdjust: '0'
+    OnFailureJobMode: replace
+    OnSuccessJobMode: fail
+    PIDFile: /run/fail2ban/fail2ban.pid
+    PartOf: firewalld.service
+    Perpetual: 'no'
+    PrivateDevices: 'no'
+    PrivateIPC: 'no'
+    PrivateMounts: 'no'
+    PrivateNetwork: 'no'
+    PrivateTmp: 'no'
+    PrivateUsers: 'no'
+    ProcSubset: all
+    ProtectClock: 'no'
+    ProtectControlGroups: 'no'
+    ProtectHome: 'no'
+    ProtectHostname: 'no'
+    ProtectKernelLogs: 'no'
+    ProtectKernelModules: 'no'
+    ProtectKernelTunables: 'no'
+    ProtectProc: default
+    ProtectSystem: 'no'
+    RefuseManualStart: 'no'
+    RefuseManualStop: 'no'
+    ReloadResult: success
+    ReloadSignal: '1'
+    RemainAfterExit: 'no'
+    RemoveIPC: 'no'
+    Requires: -.mount sysinit.target system.slice
+    RequiresMountsFor: /run/fail2ban
+    Restart: on-failure
+    RestartKillSignal: '15'
+    RestartMaxDelayUSec: infinity
+    RestartMode: normal
+    RestartPreventExitStatus: 0 255
+    RestartSteps: '0'
+    RestartUSec: 100ms
+    RestartUSecNext: 100ms
+    RestrictNamespaces: 'no'
+    RestrictRealtime: 'no'
+    RestrictSUIDSGID: 'no'
+    Result: success
+    RootDirectoryStartOnly: 'no'
+    RootEphemeral: 'no'
+    RootImagePolicy: root=verity+signed+encrypted+unprotected+absent:usr=verity+signed+encrypted+unprotected+absent:home=encrypted+unprotected+absent:srv=encrypted+unprotected+absent:tmp=encrypted+unprotected+absent:var=encrypted+unprotected+absent
+    RuntimeDirectory: fail2ban
+    RuntimeDirectoryMode: '0755'
+    RuntimeDirectoryPreserve: 'no'
+    RuntimeMaxUSec: infinity
+    RuntimeRandomizedExtraUSec: '0'
+    SameProcessGroup: 'no'
+    SecureBits: '0'
+    SendSIGHUP: 'no'
+    SendSIGKILL: 'yes'
+    SetLoginEnvironment: 'no'
+    Slice: system.slice
+    StandardError: inherit
+    StandardInput: 'null'
+    StandardOutput: journal
+    StartLimitAction: none
+    StartLimitBurst: '5'
+    StartLimitIntervalUSec: 10s
+    StartupBlockIOWeight: '[not set]'
+    StartupCPUShares: '[not set]'
+    StartupCPUWeight: '[not set]'
+    StartupIOWeight: '[not set]'
+    StartupMemoryHigh: infinity
+    StartupMemoryLow: '0'
+    StartupMemoryMax: infinity
+    StartupMemorySwapMax: infinity
+    StartupMemoryZSwapMax: infinity
+    StateChangeTimestamp: Fri 2026-07-31 14:18:39 UTC
+    StateChangeTimestampMonotonic: '4937132'
+    StateDirectoryMode: '0755'
+    StatusErrno: '0'
+    StopWhenUnneeded: 'no'
+    SubState: running
+    SuccessAction: none
+    SurviveFinalKillSignal: 'no'
+    SyslogFacility: '3'
+    SyslogLevel: '6'
+    SyslogLevelPrefix: 'yes'
+    SyslogPriority: '30'
+    SystemCallErrorNumber: '2147483646'
+    TTYReset: 'no'
+    TTYVHangup: 'no'
+    TTYVTDisallocate: 'no'
+    TasksAccounting: 'yes'
+    TasksCurrent: '5'
+    TasksMax: '16851'
+    TimeoutAbortUSec: 1min 30s
+    TimeoutCleanUSec: infinity
+    TimeoutStartFailureMode: terminate
+    TimeoutStartUSec: 1min 30s
+    TimeoutStopFailureMode: terminate
+    TimeoutStopUSec: 1min 30s
+    TimerSlackNSec: '50000'
+    Transient: 'no'
+    Type: simple
+    UID: '[not set]'
+    UMask: '0022'
+    UnitFilePreset: enabled
+    UnitFileState: enabled
+    UtmpMode: init
+    WantedBy: multi-user.target
+    WatchdogSignal: '6'
+    WatchdogTimestampMonotonic: '0'
+    WatchdogUSec: '0'
+
+TASK [common : Common | Configure unattended-upgrades] *************************
+ok: [iacgenie-server] => changed=false 
+  checksum: 76d36705feedfdb3582c5be7f0b007d8d52816d3
+  dest: /etc/apt/apt.conf.d/50unattended-upgrades
+  gid: 0
+  group: root
+  mode: '0644'
+  owner: root
+  path: /etc/apt/apt.conf.d/50unattended-upgrades
+  size: 310
+  state: file
+  uid: 0
+
+TASK [common : Common | Configure logrotate] ***********************************
+ok: [iacgenie-server] => changed=false 
+  checksum: de005aa92fc8ce4b47d6d6a0ff1fb13d12762cf5
+  dest: /etc/logrotate.conf
+  gid: 0
+  group: root
+  mode: '0644'
+  owner: root
+  path: /etc/logrotate.conf
+  size: 411
+  state: file
+  uid: 0
+
+TASK [common : Common | Configure sysctl settings] *****************************
+skipping: [iacgenie-server] => changed=false 
+  false_condition: sysctl_settings is defined
+  skip_reason: Conditional result was False
+
+TASK [common : Common | Set sysctl settings defaults] **************************
+ok: [iacgenie-server] => changed=false 
+  ansible_facts:
+    sysctl_settings:
+    - key: net.ipv4.tcp_syncookies
+      value: '1'
+    - key: net.ipv4.icmp_echo_ignore_broadcasts
+      value: '1'
+    - key: net.ipv4.conf.all.accept_redirects
+      value: '0'
+    - key: net.ipv4.conf.all.send_redirects
+      value: '0'
+    - key: net.ipv4.conf.default.accept_redirects
+      value: '0'
+    - key: net.ipv4.conf.default.send_redirects
+      value: '0'
+
+TASK [common : Common | Create deploy user] ************************************
+ok: [iacgenie-server] => changed=false 
+  append: false
+  comment: Ansible deployment user
+  group: 27
+  home: /home/deploy
+  move_home: false
+  name: deploy
+  shell: /bin/bash
+  state: present
+  uid: 1001
+
+TASK [common : Common | Configure deploy user sudo access] *********************
+ok: [iacgenie-server] => changed=false 
+  backup: ''
+  msg: ''
+
+TASK [common : Common | Create .ssh directory for deploy user] *****************
+ok: [iacgenie-server] => changed=false 
+  gid: 1001
+  group: deploy
+  mode: '0700'
+  owner: deploy
+  path: /home/deploy/.ssh
+  size: 4096
+  state: directory
+  uid: 1001
+
+TASK [common : Common | Add SSH public keys for deploy user] *******************
+skipping: [iacgenie-server] => (item=REPLACE_WITH_ACTUAL_SSH_PUBLIC_KEY)  => changed=false 
+  ansible_loop_var: item
+  false_condition: item | length > 0 and not item.startswith('REPLACE_')
+  item: REPLACE_WITH_ACTUAL_SSH_PUBLIC_KEY
+  skip_reason: Conditional result was False
+skipping: [iacgenie-server] => changed=false 
+  msg: All items skipped
+
+TASK [common : Common | Add deploy user to docker group] ***********************
+changed: [iacgenie-server] => changed=true 
+  append: true
+  comment: Ansible deployment user
+  group: 27
+  groups: docker
+  home: /home/deploy
+  move_home: false
+  name: deploy
+  shell: /bin/bash
+  state: present
+  uid: 1001
+
+TASK [common : Common | Clean apt cache] ***************************************
+ok: [iacgenie-server] => changed=false 
+  stderr: ''
+  stderr_lines: <omitted>
+  stdout: |-
+    Reading package lists...
+    Building dependency tree...
+    Reading state information...
+  stdout_lines: <omitted>
+
+TASK [common : Common | Remove unnecessary packages] ***************************
+ok: [iacgenie-server] => changed=false
+
+TASK [common : Common | Clean temporary files] *********************************
+ok: [iacgenie-server] => (item=/tmp/.X*) => changed=false 
+  ansible_loop_var: item
+  item: /tmp/.X*
+  path: /tmp/.X*
+  state: absent
+ok: [iacgenie-server] => (item=/tmp/.lock*) => changed=false 
+  ansible_loop_var: item
+  item: /tmp/.lock*
+  path: /tmp/.lock*
+  state: absent
+ok: [iacgenie-server] => (item=/var/tmp/*~) => changed=false 
+  ansible_loop_var: item
+  item: /var/tmp/*~
+  path: /var/tmp/*~
+  state: absent
+
+TASK [docker : Docker | Install Docker prerequisites] **************************
+ok: [iacgenie-server] => changed=false 
+  cache_update_time: 1785580818
+  cache_updated: false
+
+TASK [docker : Docker | Create keyrings directory] *****************************
+ok: [iacgenie-server] => changed=false 
+  gid: 0
+  group: root
+  mode: '0755'
+  owner: root
+  path: /etc/apt/keyrings
+  size: 4096
+  state: directory
+  uid: 0
+
+TASK [docker : Docker | Add Docker GPG key] ************************************
+ok: [iacgenie-server] => changed=false 
+  before:
+  - 8D81803C0EBFCD88
+  - 7EA0A9C3F273FCD8
+  fp: 8D81803C0EBFCD88
+  id: 8D81803C0EBFCD88
+  key_id: 8D81803C0EBFCD88
+  short_id: 0EBFCD88
+
+TASK [docker : Docker | Add Docker repository] *********************************
+[WARNING]: Failed to update cache after 1 due to E:The repository 'https://download.docker.com/linux/ubuntu circe Release' does not have a Release file. retry, retrying
+[WARNING]: Sleeping for 1 seconds, before attempting to update the cache again
+[WARNING]: Failed to update cache after 2 due to W:Updating from such a repository can't be done securely, and is therefore disabled by default., W:See apt-secure(8) manpage for repository creation and user configuration details., E:The repository 'https://download.docker.com/linux/ubuntu circe Release' does not have a Release file. retry, retrying
+[WARNING]: Sleeping for 2 seconds, before attempting to update the cache again
+[WARNING]: Failed to update cache after 3 due to W:Updating from such a repository can't be done securely, and is therefore disabled by default., W:See apt-secure(8) manpage for repository creation and user configuration details., E:The repository 'https://download.docker.com/linux/ubuntu circe Release' does not have a Release file. retry, retrying
+[WARNING]: Sleeping for 4 seconds, before attempting to update the cache again
+[WARNING]: Failed to update cache after 4 due to W:Updating from such a repository can't be done securely, and is therefore disabled by default., W:See apt-secure(8) manpage for repository creation and user configuration details., E:The repository 'https://download.docker.com/linux/ubuntu circe Release' does not have a Release file. retry, retrying
+[WARNING]: Sleeping for 8 seconds, before attempting to update the cache again
+[WARNING]: Failed to update cache after 5 due to W:Updating from such a repository can't be done securely, and is therefore disabled by default., W:See apt-secure(8) manpage for repository creation and user configuration details., E:The repository 'https://download.docker.com/linux/ubuntu circe Release' does not have a Release file. retry, retrying
+[WARNING]: Sleeping for 12 seconds, before attempting to update the cache again
+[ERROR]: Task failed: Module failed: Failed to update apt cache after 5 retries: W:Updating from such a repository can't be done securely, and is therefore disabled by default., W:See apt-secure(8) manpage for repository creation and user configuration details., E:The repository 'https://download.docker.com/linux/ubuntu circe Release' does not have a Release file.
+Origin: /Users/manjunathkanavi/projects/iacgenie-deploy/roles/docker/tasks/add_repo.yml:15:3
+
+13     state: present
+14
+15 - name: "Docker | Add Docker repository"
+     ^ column 3
+
+fatal: [iacgenie-server]: FAILED! => changed=false 
+  msg: 'Failed to update apt cache after 5 retries: W:Updating from such a repository can''t be done securely, and is therefore disabled by default., W:See apt-secure(8) manpage for repository creation and user configuration details., E:The repository ''https://download.docker.com/linux/ubuntu circe Release'' does not have a Release file.'
+
+PLAY RECAP *********************************************************************
+iacgenie-server            : ok=27   changed=2    unreachable=0    failed=1    skipped=2    rescued=0    ignored=0   
+

@@ -5,7 +5,6 @@
   become_method: sudo
   
   roles:
-    - role: docker-compose-generator
     - role: postgresql
     - role: redis
     - role: minio
@@ -16,5 +15,6 @@
     - role: searxng
     - role: nsqd
     - role: pagezen
+    - role: docker-compose-generator
     - role: nginx
     - role: cloudflare_tunnel

@@ -1,6 +1,8 @@
 ---
-# LightSerp role - Handlers
-- name: Restart lightserp-api
-  ansible.builtin.command: docker compose -p iacgenie restart lightserp-api
-- name: Restart lightserp-webui
-  ansible.builtin.command: docker compose -p iacgenie restart lightserp-webui
+- name: "No-op: restart lightserp-api (use docker-compose-generator reload instead)"
+  ansible.builtin.debug:
+    msg: "Container restart handled by docker-compose-generator. No separate restart needed."
+
+- name: "No-op: restart lightserp-webui (use docker-compose-generator reload instead)"
+  ansible.builtin.debug:
+    msg: "Container restart handled by docker-compose-generator. No separate restart needed."

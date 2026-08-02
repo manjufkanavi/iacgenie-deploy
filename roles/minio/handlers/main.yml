@@ -1,4 +1,4 @@
 ---
-# MinIO role - Handlers
-- name: Restart minio
-  ansible.builtin.command: docker compose -p iacgenie restart minio
+- name: "No-op: restart minio (use docker-compose-generator reload instead)"
+  ansible.builtin.debug:
+    msg: "Container restart handled by docker-compose-generator. No separate restart needed."

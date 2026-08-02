@@ -1,5 +1,12 @@
 ---
 # Docker Compose Generator - Network setup
+# Docker replaces hyphens with underscores in network names
+- name: "Compose Gen | Check if Docker network exists"
+  ansible.builtin.command: "docker network inspect {{ docker_network_name | default('iacgenie-network') | replace('-', '_') }}"
+  register: _net_check
+  changed_when: false
+  failed_when: false
+
 - name: "Compose Gen | Create Docker network"
   community.docker.docker_network:
     name: "{{ docker_network_name | default('iacgenie-network') }}"
@@ -7,5 +14,6 @@
     ipam_config:
       - subnet: "{{ docker_network_subnet | default('172.28.0.0/16') }}"
     state: present
+  when: _net_check.rc != 0
   tags:
     - docker-network

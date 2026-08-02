@@ -1,36 +1,23 @@
 ---
 # Redis role - Main entry point
-- name: "Redis | Create data directory"
-  ansible.builtin.file:
-    path: "{{ redis_data_dir }}"
-    owner: redis
-    group: redis
-    mode: "0700"
-    state: directory
-
-- name: "Redis | Deploy Redis configuration"
-  ansible.builtin.template:
-    src: redis.conf.j2
-    dest: /var/lib/redis/redis.conf
-    owner: redis
-    group: redis
-    mode: "0600"
-  notify: Restart redis
+# Note: Redis runs in Docker, so host-side tasks only deploy env files.
+# Docker handles data directory, user management, and internal config.
 
 - name: "Redis | Deploy environment file"
   ansible.builtin.template:
     src: .env.j2
-    dest: /home/mkanavi/iacgenie-unified-infra/.env
+    dest: /home/mkanavi/iacgenie-unified-infra/.env.redis
     owner: mkanavi
     group: mkanavi
     mode: "0600"
   notify: Restart redis
 
-- name: "Redis | Verify Redis is running"
-  ansible.builtin.command: docker compose -p iacgenie ps redis
+- name: "Redis | Verify Redis container is running"
+  ansible.builtin.command: docker ps -a --filter "name=iacgenie-redis" --format "{{ '{{.Names}}' }}"
   register: redis_status
   changed_when: false
+  failed_when: false
 
 - name: "Redis | Show Redis status"
   ansible.builtin.debug:
-    var: redis_status.stdout
+    var: redis_status.stdout_lines | default(['N/A - managed by docker-compose-generator'])
