@@ -24,7 +24,7 @@ docker_edition: ce
 docker_ce_version: "29.1"
 docker_compose_plugin_version: "2.29.0"
 docker_network_name: iacgenie-network
-docker_network_subnet: "172.28.0.0/16"
+docker_network_subnet: "172.29.0.0/16"
 docker_log_driver: json-file
 docker_log_max_size: "10m"
 docker_log_max_file: "3"
