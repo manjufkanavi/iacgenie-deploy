@@ -7,12 +7,25 @@ metrics: 0.0.0.0:{{ cloudflared_metrics_port | default(12345) }}
 no-autoupdate: true
 
 tunnel: {{ cloudflared_tunnel_name | default('iacgenie-tunnel') }}
-credentials-file: /etc/cloudflared/{{ cloudflared_tunnel_name }}.json
+credentials-file: /etc/cloudflared/{{ cloudflared_tunnel_name | default('iacgenie-tunnel') }}.json
 grace-period: 30s
 
 # Cloudflare handles SSL termination at the edge.
 # Traffic flows: Cloudflare Edge → cloudflared → nginx (127.0.0.1:80) → Docker containers
 # nginx reverse proxy handles hostname-based routing to correct container ports.
 
-# Catch-all: route all requests through nginx reverse proxy
-service: http://127.0.0.1:80
+{% if cloudflare_ingress_rules | default([]) | length > 0 %}
+# Custom ingress rules (from cloudflare_ingress_rules variable)
+ingress:
+{% for rule in cloudflare_ingress_rules %}
+  - hostname: {{ rule.hostname }}
+    service: {{ rule.service }}
+{% endfor %}
+  - service: http://status.tcp:8080
+{% else %}
+# Default ingress: route all *.iacgenie.com traffic through nginx reverse proxy
+ingress:
+  - hostname: '*.iacgenie.com'
+    service: http://127.0.0.1:80
+  - service: http://status.tcp:8080
+{% endif %}
