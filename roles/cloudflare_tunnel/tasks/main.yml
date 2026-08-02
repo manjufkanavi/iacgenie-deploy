@@ -57,11 +57,41 @@
 # ========================
 # Tunnel auto-provisioning
 # ========================
-- name: "Cloudflare | Check if account cert (cert.pem) exists"
+
+# Handle legacy argotunnel.json migration (pre-2025.3 format)
+# The old format stored credentials directly in argotunnel.json without cert.pem.
+# New format requires cloudflared tunnel login to generate cert.pem.
+# If argotunnel.json exists but cert.pem doesn't, we need to complete the login process.
+
+- name: "Cloudflare | Check if origin cert (cert.pem) exists"
   ansible.builtin.stat:
     path: /home/mkanavi/.cloudflared/cert.pem
   register: cloudflared_cert
   failed_when: false
+
+- name: "Cloudflare | Check for legacy argotunnel.json"
+  ansible.builtin.stat:
+    path: /home/mkanavi/.cloudflared/argotunnel.json
+  register: legacy_argotunnel
+  failed_when: false
+
+- name: "Cloudflare | Copy legacy argotunnel.json to system credentials"
+  ansible.builtin.command:
+    cmd: "cp /home/mkanavi/.cloudflared/argotunnel.json /etc/cloudflared/iacgenie-tunnel.json && chown root:root /etc/cloudflared/iacgenie-tunnel.json && chmod 600 /etc/cloudflared/iacgenie-tunnel.json"
+  when:
+    - legacy_argotunnel.stat.exists
+    - not cloudflared_cert.stat.exists
+  changed_when: true
+
+# ========================
+# Tunnel login (requires Cloudflare API Token)
+# ========================
+# cloudflared tunnel login generates:
+#   1. ~/.cloudflared/cert.pem (origin certificate)
+#   2. Updates tunnel credentials if API token has tunnel scope
+#
+# API Token required at: https://dash.cloudflare.com/profile/api-tokens
+# Permissions needed: Zone.Zone > Read, Cloudflare Tunnel > Manage
 
 - name: "Cloudflare | Tunnel login via API token"
   ansible.builtin.shell: |
@@ -75,22 +105,35 @@
     - cloudflared_api_token is defined
     - cloudflared_api_token != 'CHANGE_ME_IN_VAULT'
     - not cloudflared_cert.stat.exists
+  failed_when: false
 
-- name: "Cloudflare | Tunnel login — interactive (fallback)"
-  ansible.builtin.command: cloudflared tunnel login
+- name: "Cloudflare | Tunnel login — interactive (manual step required)"
+  ansible.builtin.debug:
+    msg: |
+      WARNING: cloudflared tunnel login requires interactive browser authentication.
+      
+      Please run the following commands on the VM:
+      
+        ssh newvm
+        cloudflared tunnel login
+      
+      This will open a browser for Cloudflare authentication.
+      The generated cert.pem will be saved to ~/.cloudflared/cert.pem
+      
+      Then re-run this playbook to complete the setup.
   when:
-    - cloudflared_api_token is not defined
-    - cloudflared_api_token is defined | default(false) == false
     - not cloudflared_cert.stat.exists
-  ignore_errors: true
 
+# ========================
+# Tunnel creation (if not already created)
+# ========================
 - name: "Cloudflare | Check if tunnel credentials file exists"
   ansible.builtin.stat:
     path: /etc/cloudflared/{{ cloudflared_tunnel_name }}.json
   register: cloudflared_creds
   failed_when: false
 
-- name: "Cloudflare | Create tunnel"
+- name: "Cloudflare | Create tunnel (if credentials file missing)"
   ansible.builtin.command: "cloudflared tunnel create {{ cloudflared_tunnel_name }}"
   args:
     creates: /home/mkanavi/.cloudflared/{{ cloudflared_tunnel_name }}.json
@@ -98,6 +141,7 @@
     - not cloudflared_creds.stat.exists
   register: cloudflared_create_result
   changed_when: cloudflared_create_result is changed
+  failed_when: false
 
 - name: "Cloudflare | Check if tunnel was just created in user dir"
   ansible.builtin.stat:

@@ -1,29 +1,18 @@
 # Cloudflare Tunnel configuration
 # Managed by Ansible
+# NOTE: Cloudflared runs as a host-level systemd service.
+# All services must be reachable via 127.0.0.1:<host_port>
+# Docker container hostnames are NOT resolvable from the host.
 metrics: 0.0.0.0:{{ cloudflared_metrics_port | default(12345) }}
 no-autoupdate: true
 
-tunnels:
-  - name: {{ cloudflared_tunnel_name | default('iacgenie-tunnel') }}
-    credentials-file: /etc/cloudflared/{{ cloudflared_tunnel_name }}.json
-    gracePeriod: 30s
+tunnel: {{ cloudflared_tunnel_name | default('iacgenie-tunnel') }}
+credentials-file: /etc/cloudflared/{{ cloudflared_tunnel_name }}.json
+grace-period: 30s
 
-# Edge routes (top-level ingress rules)
-ingress:
-  - hostname: {{ cloudflared_default_hostname | default('iacgenie.com') }}
-    path: {{ cloudflared_default_path | default('/') }}
-    service: {{ cloudflared_default_service | default('http://nginx:80') }}
+# Cloudflare handles SSL termination at the edge.
+# Traffic flows: Cloudflare Edge → cloudflared → nginx (127.0.0.1:80) → Docker containers
+# nginx reverse proxy handles hostname-based routing to correct container ports.
 
-# Service rules — maps each subdomain to the correct Docker service
-serviceRules:
-{% for domain, svc in cloudflared_services | default({
-  'auth.iacgenie.com': 'http://keycloak:8080',
-  'search.iacgenie.com': 'http://searxng:8080',
-  'api.iacgenie.com': 'http://lightserp-api:8000',
-  'app.iacgenie.com': 'http://lightserp-webui:3001',
-  'git.iacgenie.com': 'http://gitea:3000',
-  'page.iacgenie.com': 'http://pagezen:8081'
-}) | items %}
-  - hostname: {{ domain }}
-    service: {{ svc }}
-{% endfor %}
+# Catch-all: route all requests through nginx reverse proxy
+service: http://127.0.0.1:80

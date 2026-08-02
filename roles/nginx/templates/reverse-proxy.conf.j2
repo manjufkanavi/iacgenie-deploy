@@ -1,6 +1,8 @@
 # Nginx reverse proxy for IacGenie services
 # Managed by Ansible — production hardened with security headers
-# Merged from: reverse-proxy.conf.j2 + nginx-unified.conf
+# NOTE: Nginx runs as a host-level systemd service.
+# All proxy_pass must target 127.0.0.1:<host_published_port>
+# Docker container hostnames are NOT resolvable from the host.
 
 map $http_upgrade $connection_upgrade {
     default upgrade;
@@ -19,13 +21,16 @@ server {
     return 301 https://$host$request_uri;
 }
 
-# Keycloak (auth) — restricted to general zone
+# Wildcard SSL certificate for all *.iacgenie.com domains
+set $ssl_cert_path /etc/letsencrypt/live/iacgenie.com;
+
+# Keycloak (auth)
 server {
     listen 443 ssl http2;
-    server_name {{ wildcard_domains[0] | replace('*', 'auth') if wildcard_domains else 'auth.iacgenie.com' }};
+    server_name auth.iacgenie.com;
 
-    ssl_certificate /etc/letsencrypt/live/auth/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/auth/privkey.pem;
+    ssl_certificate /etc/letsencrypt/live/iacgenie.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/iacgenie.com/privkey.pem;
 
     ssl_protocols       TLSv1.2 TLSv1.3;
     ssl_ciphers         ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384;
@@ -43,7 +48,7 @@ server {
     limit_req zone=auth burst=5 nodelay;
 
     location / {
-        proxy_pass http://keycloak:8080;
+        proxy_pass http://127.0.0.1:8083;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -56,7 +61,7 @@ server {
 
     location /login* {
         limit_req zone=auth burst=3 nodelay;
-        proxy_pass http://keycloak:8080;
+        proxy_pass http://127.0.0.1:8083;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -67,10 +72,10 @@ server {
 # SearXNG (search)
 server {
     listen 443 ssl http2;
-    server_name {{ wildcard_domains[0] | replace('*', 'search') if wildcard_domains else 'search.iacgenie.com' }};
+    server_name search.iacgenie.com;
 
-    ssl_certificate /etc/letsencrypt/live/search/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/search/privkey.pem;
+    ssl_certificate /etc/letsencrypt/live/iacgenie.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/iacgenie.com/privkey.pem;
 
     ssl_protocols       TLSv1.2 TLSv1.3;
     ssl_ciphers         ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384;
@@ -88,7 +93,7 @@ server {
     limit_req zone=api burst=30 nodelay;
 
     location / {
-        proxy_pass http://searxng:8080;
+        proxy_pass http://127.0.0.1:8082;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -100,10 +105,10 @@ server {
 # LightSerp API (api)
 server {
     listen 443 ssl http2;
-    server_name {{ wildcard_domains[0] | replace('*', 'api') if wildcard_domains else 'api.iacgenie.com' }};
+    server_name api.iacgenie.com;
 
-    ssl_certificate /etc/letsencrypt/live/api/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/api/privkey.pem;
+    ssl_certificate /etc/letsencrypt/live/iacgenie.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/iacgenie.com/privkey.pem;
 
     ssl_protocols       TLSv1.2 TLSv1.3;
     ssl_ciphers         ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384;
@@ -121,7 +126,7 @@ server {
     limit_req zone=api burst=30 nodelay;
 
     location / {
-        proxy_pass http://lightserp-api:8000;
+        proxy_pass http://127.0.0.1:8000;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -136,10 +141,10 @@ server {
 # LightSerp WebUI (app)
 server {
     listen 443 ssl http2;
-    server_name {{ wildcard_domains[0] | replace('*', 'app') if wildcard_domains else 'app.iacgenie.com' }};
+    server_name app.iacgenie.com;
 
-    ssl_certificate /etc/letsencrypt/live/app/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/app/privkey.pem;
+    ssl_certificate /etc/letsencrypt/live/iacgenie.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/iacgenie.com/privkey.pem;
 
     ssl_protocols       TLSv1.2 TLSv1.3;
     ssl_ciphers         ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384;
@@ -157,7 +162,7 @@ server {
     limit_req zone=general burst=20 nodelay;
 
     location / {
-        proxy_pass http://lightserp-webui:3001;
+        proxy_pass http://127.0.0.1:3001;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -172,10 +177,10 @@ server {
 # Gitea (git)
 server {
     listen 443 ssl http2;
-    server_name {{ wildcard_domains[0] | replace('*', 'git') if wildcard_domains else 'git.iacgenie.com' }};
+    server_name git.iacgenie.com;
 
-    ssl_certificate /etc/letsencrypt/live/git/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/git/privkey.pem;
+    ssl_certificate /etc/letsencrypt/live/iacgenie.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/iacgenie.com/privkey.pem;
 
     ssl_protocols       TLSv1.2 TLSv1.3;
     ssl_ciphers         ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384;
@@ -193,7 +198,7 @@ server {
     limit_req zone=general burst=20 nodelay;
 
     location / {
-        proxy_pass http://gitea:3000;
+        proxy_pass http://127.0.0.1:3000;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -205,10 +210,10 @@ server {
 # PageZen (page)
 server {
     listen 443 ssl http2;
-    server_name {{ wildcard_domains[0] | replace('*', 'page') if wildcard_domains else 'page.iacgenie.com' }};
+    server_name page.iacgenie.com;
 
-    ssl_certificate /etc/letsencrypt/live/page/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/page/privkey.pem;
+    ssl_certificate /etc/letsencrypt/live/iacgenie.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/iacgenie.com/privkey.pem;
 
     ssl_protocols       TLSv1.2 TLSv1.3;
     ssl_ciphers         ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384;
@@ -226,7 +231,7 @@ server {
     limit_req zone=general burst=20 nodelay;
 
     location / {
-        proxy_pass http://pagezen:8081;
+        proxy_pass http://127.0.0.1:8081;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
