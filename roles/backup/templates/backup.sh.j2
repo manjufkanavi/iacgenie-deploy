@@ -47,13 +47,13 @@ docker run --rm --name $CONTAINER_NAME \
   alpine tar czf /backup/gitea_$DATE.tar.gz /data
 
 # Clean old backups
-echo "Cleaning old backups (>${{ backup_retention_days }} days)..."
+echo "Cleaning old backups (>30 days)..."
 find $BACKUP_DIR -type f -mtime +$RETENTION_DAYS -delete
 
 # Rclone sync to Google Drive if enabled
 {% if rclone_remote | default('gdrive') %}
 echo "Syncing to Google Drive..."
-rclone sync $BACKUP_DIR {{ rclone_remote }}:{{ rclone_dest | default('iacgenie-backups') }}/ --max-age {{ retention_days }}d --progress
+rclone sync $BACKUP_DIR {{ rclone_remote }}:{{ rclone_dest | default('iacgenie-backups') }}/ --max-age {{ backup_retention_days | default(30) }}d --progress
 {% endif %}
 
 echo "Backup completed at $(date)"

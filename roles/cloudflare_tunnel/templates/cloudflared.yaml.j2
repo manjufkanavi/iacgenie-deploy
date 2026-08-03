@@ -34,7 +34,7 @@ tunnel: {{ cloudflared_tunnel_name | default('iacgenie-tunnel') }}
 credentials-file: /etc/cloudflared/{{ cloudflared_tunnel_name | default('iacgenie-tunnel') }}.json
 grace-period: 30s
 {% if cloudflare_origin_cert | default('/home/mkanavi/.cloudflared/cert.pem') %}
-origincert: {{ cloudflare_origin_cert }}
+origincert: {{ cloudflare_origin_cert | default('/home/mkanavi/.cloudflared/cert.pem') }}
 {% endif %}
 
 {% if cloudflare_ingress_rules | default([]) | length > 0 %}

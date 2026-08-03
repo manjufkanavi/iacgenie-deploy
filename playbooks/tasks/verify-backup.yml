@@ -1,0 +1,42 @@
+---
+# Phase 10.4: Backup & DR verification
+
+- name: "10.19 | Backup | Verify OpenBao raft snapshot exists"
+  ansible.builtin.stat:
+    path: "{{ openbao_raft_dir }}/meta.json"
+  register: openbao_raft_meta
+  changed_when: false
+  failed_when: false
+
+- name: "10.19 | Backup | Verify Postgres backups exist"
+  ansible.builtin.find:
+    paths: "{{ backup_dest }}"
+    patterns: "*.sql.gz"
+    depth: 1
+  register: pg_backups
+  changed_when: false
+
+- name: "10.19 | Backup | Verify Gitea backups exist"
+  ansible.builtin.find:
+    paths: "{{ backup_dest }}"
+    patterns: "gitea-*.tar.gz"
+    depth: 1
+  register: gitea_backups
+  changed_when: false
+
+- name: "10.19 | Backup | Verify rclone sync to GDrive"
+  ansible.builtin.shell:
+    cmd: rclone ls gdrive:iacgenie-backups/ | head -5
+    executable: /bin/bash
+  register: rclone_check
+  changed_when: false
+  failed_when: false
+
+- name: "10.19 | Backup | Display verification summary"
+  ansible.builtin.debug:
+    msg: >
+      Backup & DR verification:
+      OpenBao raft snapshot: {{ 'EXISTS' if openbao_raft_meta.stat.exists else 'MISSING' }}
+      Postgres backups: {{ pg_backups.files | length }}
+      Gitea backups: {{ gitea_backups.files | length }}
+      GDrive sync: {{ 'OK' if rclone_check.stdout_lines else 'FAIL' }}
