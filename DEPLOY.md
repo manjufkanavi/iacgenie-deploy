@@ -183,6 +183,48 @@ Rootless image runs as UID 100, GID 1000. **Fix:** Data directory owner must be 
 ### SearXNG
 SearXNG requires `SEARXNG_SECRET` env var. Must be generated with: `python3 -c "import secrets; print(secrets.token_hex(32))"`
 
+## Security Hardening (Phase 10.2)
+
+### Network Segmentation (10.7)
+Services now split across three isolated Docker networks:
+- **iacgenie-frontend**: nginx, lightserp-webui, pagezen, searxng, lightserp-api (nginx-facing services)
+- **iacgenie-backend**: postgres, redis, minio, openbao, keycloak, gitea (data & auth services — no direct internet access)
+- **iacgenie-messaging**: nsqd (pub/sub services)
+
+### Hardcoded Secrets Removed (10.6)
+- Gitea admin password moved from docker-compose to `${GITEA_ADMIN_PASSWORD}` env var
+- All credentials sourced from OpenBao via `.env` files
+- Gitea admin username now configurable via `GITEA_ADMIN_USERNAME` env var
+
+### Security Headers Added (10.8)
+All Nginx reverse proxy configurations now include:
+- `Strict-Transport-Security` (HSTS with preload)
+- `X-Frame-Options: SAMEORIGIN/DENY`
+- `X-Content-Type-Options: nosniff`
+- `X-XSS-Protection: 1; mode=block`
+- `Referrer-Policy: strict-origin-when-cross-origin`
+- `Content-Security-Policy` (per-service, restrictive)
+- `Permissions-Policy` (camera, mic, geolocation, payment blocked)
+- `X-Permitted-Cross-Domain-Policies: none`
+
+### Gitea Hardening (10.9)
+- Registration disabled (`gitea_disable_registration: true`)
+- 2FA enforcement enabled (`gitea_2fa_enforce: true`)
+- CAPTCHA enabled, Gravatar disabled
+- Minimum 12-character password requirement
+- SMTP configured for secure password recovery
+- Session lifetime: 24h with secure cookies
+
+### MinIO Console Locked Down (10.10)
+- Console port 9001 no longer directly exposed on MinIO service
+- Access only via `minio-console` nginx proxy container (localhost-only)
+- Admin access via Nginx reverse proxy with JWT authentication
+
+### Secrets in Ansible Vault
+- `inventory/group_vars/all.yml` — encrypted
+- `group_vars/cloudflare_tunnel.yml` — encrypted
+- All sensitive values in OpenBao at `iacgenie/` path
+
 ## Infrastructure Services
 
 - **Nginx:** Reverse proxy at `/etc/nginx/sites-enabled/`

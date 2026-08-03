@@ -189,6 +189,8 @@ services:
       GITEA__database__NAME: gitea
       GITEA__database__USER: gitea
       GITEA__database__PASSWORD: "${GITEA_DB_PASSWORD}"
+      GITEA__admin__INIT_ROOT_USER_NAME: "${GITEA_ADMIN_USERNAME:-admin}"
+      GITEA__admin__INIT_ROOT_USER_PASSWORD: "${GITEA_ADMIN_PASSWORD}"
       GITEA__security__INSTALL_LOCK: "true"
       GITEA__security__DISABLE_REGISTRATION: "{{ gitea_disable_registration | default('true') }}"
       GITEA__service__DISABLE_REGISTRATION: "{{ gitea_disable_registration | default('true') }}"
@@ -202,9 +204,13 @@ services:
       GITEA__mailer__FROM: "{{ smtp_from | default('noreply@iacgenie.com') }}"
       GITEA__security__DISABLE_GRAVATAR: "true"
       GITEA__security__ENABLE_CAPTCHA: "true"
+      GITEA__security__MIN_PASSWORD_LENGTH: 12
+      # 2FA enforcement (Phase 10.9)
+      GITEA__security__DEFAULT_ENABLE_2FA: "{{ gitea_2fa_enforce | default('true') }}"
       GITEA__session__SESSION_LIFETIME: 86400
       GITEA__session__COOKIE_SECURE: "true"
-      GITEA__security__MIN_PASSWORD_LENGTH: 12
+      GITEA__security__DEFAULT_ENABLE_QUOTAS: "false"
+      GITEA__api__ENABLE_SWAGGER: "true"
     volumes:
       - /home/mkanavi/docker/iacgenie/data/gitea:/var/lib/gitea
       - /home/mkanavi/docker/iacgenie/data/gitea:/etc/gitea
