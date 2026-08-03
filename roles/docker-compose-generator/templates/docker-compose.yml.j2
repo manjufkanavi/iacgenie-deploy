@@ -124,7 +124,7 @@ services:
     image: quay.io/keycloak/keycloak:26.0
     container_name: iacgenie_keycloak
     restart: unless-stopped
-    command: start --http-enabled=true --http-port=8080 --db=postgres --db-url=jdbc:postgresql://postgres:5432/keycloak --db-username=keycloak --db-password="${KC_DB_PASSWORD}" --hostname=http://auth.iacgenie.com
+    command: start --http-enabled=true --http-port=8080 --db=postgres --db-url=jdbc:postgresql://postgres:5432/keycloak --db-username=keycloak --db-password="${KC_DB_PASSWORD}" --hostname=https://auth.iacgenie.com
     environment:
       KC_BOOTSTRAP_ADMIN_USERNAME: "${KEYCLOAK_ADMIN_USER}"
       KC_BOOTSTRAP_ADMIN_PASSWORD: "${KEYCLOAK_ADMIN_PASSWORD}"
@@ -183,7 +183,7 @@ services:
     depends_on:
       - postgres
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://127.0.0.1:3000/"]
+      test: ["CMD-SHELL", "exec 6<>/dev/tcp/127.0.0.1/3000 && exec 6>&-"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -207,8 +207,10 @@ services:
       SEARXNG_URL: "http://searxng:8080"
       LIGHTSERP_S3_BASE: "iacgenie-lightserp"
       LIGHTSERP_ALLOW_INSECURE: "true"
+      REDIS_URL: "redis://redis:6379"
+      DATABASE_URL: "postgresql://lightsrp:${PG_ROOT_PASSWORD}@postgres:5432/lightsrp"
     ports:
-      - "127.0.0.1:8000:8000"
+      - "127.0.0.1:8000:3000"
     networks:
       - "{{ docker_network_name | default('iacgenie-network') }}"
     depends_on:
@@ -229,7 +231,7 @@ services:
     container_name: iacgenie_lightserp_webui
     restart: unless-stopped
     ports:
-      - "127.0.0.1:3001:3001"
+      - "127.0.0.1:3001:3070"
     networks:
       - "{{ docker_network_name | default('iacgenie-network') }}"
     depends_on:
@@ -279,7 +281,7 @@ services:
     networks:
       - "{{ docker_network_name | default('iacgenie-network') }}"
     healthcheck:
-      test: ["CMD-SHELL", "wget -q -O- http://127.0.0.1:4151/ping 2>/dev/null | grep -q ping || exit 1"]
+      test: ["CMD-SHELL", "exec 6<>/dev/tcp/127.0.0.1/4150 && exec 6>&-"]
       interval: 30s
       timeout: 10s
       retries: 3
