@@ -124,7 +124,7 @@ services:
     image: quay.io/keycloak/keycloak:26.0
     container_name: iacgenie_keycloak
     restart: unless-stopped
-    command: start --http-enabled=true --http-port=8080 --db=postgres --db-url=jdbc:postgresql://postgres:5432/keycloak --db-username=keycloak --db-password="${KC_DB_PASSWORD}" --hostname=https://auth.iacgenie.com
+    command: start --http-enabled=true --http-port=8080 --db-url-host=postgres --db-url-port=5432 --db-url-database=keycloak --db-username=keycloak --db-password="${KC_DB_PASSWORD}" --hostname=https://auth.iacgenie.com --hostname-admin=https://auth.iacgenie.com
     environment:
       KC_BOOTSTRAP_ADMIN_USERNAME: "${KEYCLOAK_ADMIN_USER}"
       KC_BOOTSTRAP_ADMIN_PASSWORD: "${KEYCLOAK_ADMIN_PASSWORD}"
@@ -200,10 +200,12 @@ services:
     container_name: iacgenie_lightserp_api
     restart: unless-stopped
     environment:
+      LOGTIDE_URL: http://localhost:4318/v1/traces
       MINIO_ENDPOINT: "minio:9000"
       MINIO_ACCESS_KEY: "${MINIO_ROOT_USER}"
       MINIO_SECRET_KEY: "${MINIO_ROOT_PASSWORD}"
       NSQD_ADDR: "nsqd:4150"
+      LIGHTSERP_PAGEZEN_API: "http://pagezen:8082"
       SEARXNG_URL: "http://searxng:8080"
       LIGHTSERP_S3_BASE: "iacgenie-lightserp"
       LIGHTSERP_ALLOW_INSECURE: "true"
