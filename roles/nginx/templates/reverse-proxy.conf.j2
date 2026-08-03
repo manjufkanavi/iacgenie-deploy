@@ -14,6 +14,15 @@ limit_req_zone $binary_remote_addr zone=general:10m rate=10r/s;
 limit_req_zone $binary_remote_addr zone=auth:10m rate=3r/m;
 limit_req_zone $binary_remote_addr zone=api:10m rate=30r/s;
 
+# CORS headers — defined once, referenced via variables
+map $request_method $cors_method_header {
+    OPTIONS 'GET, POST, PUT, DELETE, PATCH, OPTIONS';
+    default 'GET, POST, PUT, DELETE, PATCH';
+}
+map $http_origin $cors_origin_header {
+    default "";
+}
+
 # ====== HTTP: Default redirect (external users, not cloudflared) ======
 server {
     listen 80 default_server;
@@ -128,11 +137,18 @@ server {
     ssl_session_timeout 1d;
     ssl_session_tickets off;
 
+    # Security headers (Phase 10.8)
     add_header Strict-Transport-Security "max-age=63072000; includeSubDomains; preload" always;
     add_header X-Frame-Options "SAMEORIGIN" always;
     add_header X-Content-Type-Options "nosniff" always;
     add_header X-XSS-Protection "1; mode=block" always;
     add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+    add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://avatars.githubusercontent.com; connect-src 'self' https://auth.iacgenie.com; frame-ancestors 'none';" always;
+    add_header Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=(), usb=(), magnetometer=(), gyroscope=(), accelerometer=()" always;
+    add_header X-Permitted-Cross-Domain-Policies "none" always;
+    add_header Cross-Origin-Embedder-Policy "require-corp" always;
+    add_header Cross-Origin-Opener-Policy "same-origin" always;
+    add_header Cross-Origin-Resource-Policy "same-origin" always;
 
     limit_req zone=auth burst=5 nodelay;
 
@@ -178,6 +194,9 @@ server {
     add_header X-Content-Type-Options "nosniff" always;
     add_header X-XSS-Protection "1; mode=block" always;
     add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+    add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self' https://search.iacgenie.com; frame-ancestors 'none';" always;
+    add_header Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=(), usb=()" always;
+    add_header X-Permitted-Cross-Domain-Policies "none" always;
 
     limit_req zone=api burst=30 nodelay;
 
@@ -211,6 +230,26 @@ server {
     add_header X-Content-Type-Options "nosniff" always;
     add_header X-XSS-Protection "1; mode=block" always;
     add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+    add_header Content-Security-Policy "default-src 'none';" always;
+    add_header Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=()" always;
+    add_header X-Permitted-Cross-Domain-Policies "none" always;
+
+    # CORS — only allow requests from the web frontend
+    if ($request_method = 'OPTIONS') {
+        add_header 'Access-Control-Allow-Origin' '$http_origin' always;
+        add_header 'Access-Control-Allow-Methods' 'GET, POST, PUT, DELETE, PATCH, OPTIONS' always;
+        add_header 'Access-Control-Allow-Headers' 'Authorization, Content-Type, X-Api-Key' always;
+        add_header 'Access-Control-Max-Age' 86400 always;
+        add_header 'Content-Length' 0 always;
+        add_header 'Content-Type' 'text/plain' always;
+        return 204;
+    }
+    if ($request_method ~* '(GET|POST|PUT|DELETE|PATCH)') {
+        add_header 'Access-Control-Allow-Origin' '$http_origin' always;
+        add_header 'Access-Control-Allow-Methods' 'GET, POST, PUT, DELETE, PATCH' always;
+        add_header 'Access-Control-Allow-Headers' 'Authorization, Content-Type, X-Api-Key' always;
+        add_header 'Access-Control-Allow-Credentials' 'true' always;
+    }
 
     limit_req zone=api burst=30 nodelay;
 
@@ -247,6 +286,9 @@ server {
     add_header X-Content-Type-Options "nosniff" always;
     add_header X-XSS-Protection "1; mode=block" always;
     add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+    add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' 'unsafe-eval'; img-src 'self' data: https:; connect-src 'self' api.iacgenie.com; frame-ancestors 'none';" always;
+    add_header Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=()" always;
+    add_header X-Permitted-Cross-Domain-Policies "none" always;
 
     limit_req zone=general burst=20 nodelay;
 
@@ -283,6 +325,9 @@ server {
     add_header X-Content-Type-Options "nosniff" always;
     add_header X-XSS-Protection "1; mode=block" always;
     add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+    add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self'; font-src 'self' https://cdn.jsdelivr.net; frame-ancestors 'none';" always;
+    add_header Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=()" always;
+    add_header X-Permitted-Cross-Domain-Policies "none" always;
 
     limit_req zone=general burst=20 nodelay;
 
@@ -316,6 +361,9 @@ server {
     add_header X-Content-Type-Options "nosniff" always;
     add_header X-XSS-Protection "1; mode=block" always;
     add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+    add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self' api.iacgenie.com; frame-ancestors 'none';" always;
+    add_header Permissions-Policy "camera=(), microphone=(), geolocation=()" always;
+    add_header X-Permitted-Cross-Domain-Policies "none" always;
 
     limit_req zone=general burst=20 nodelay;
 

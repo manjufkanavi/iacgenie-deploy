@@ -10,6 +10,7 @@
     - role: minio
     - role: openbao
     - role: keycloak
+    - role: keycloak_realm
     - role: gitea
     - role: lightserp
     - role: searxng
@@ -25,3 +26,6 @@
     - import_tasks: roles/openbao/tasks/unseal.yml
       when:
         - not openbao_skip_unseal | default(false) | bool
+    - import_tasks: roles/keycloak_realm/tasks/main.yml
+      when:
+        - keycloak_provision_realm | default(true) | bool

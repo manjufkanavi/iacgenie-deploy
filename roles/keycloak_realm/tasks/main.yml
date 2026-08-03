@@ -1,0 +1,119 @@
+---
+# Keycloak realm provisioning for iacgenie
+# Creates realm, roles, client scopes, and clients via Keycloak Admin API
+# Requires: keycloak_admin_url, keycloak_admin_user, keycloak_admin_password
+
+- name: Get Keycloak admin token
+  ansible.builtin.uri:
+    url: "{{ keycloak_admin_url | default('https://auth.iacgenie.com') }}/admin/realms/master/protocol/openid-connect/token"
+    method: POST
+    body_format: form-urlencoded
+    body:
+      grant_type: password
+      username: "{{ keycloak_admin_user }}"
+      password: "{{ keycloak_admin_password }}"
+      client_id: admin-cli
+    status_code: [200]
+  register: kc_token_response
+  changed_when: false
+
+- name: Set keycloak_admin_token fact
+  ansible.builtin.set_fact:
+    keycloak_admin_token: "{{ kc_token_response.json.access_token }}"
+
+- name: Check if iacgenie realm already exists
+  ansible.builtin.uri:
+    url: "{{ keycloak_admin_url | default('https://auth.iacgenie.com') }}/admin/realms/iacgenie"
+    method: GET
+    headers:
+      Authorization: "Bearer {{ keycloak_admin_token }}"
+    status_code: [200, 404]
+  register: kc_realm_check
+  changed_when: false
+
+- name: Create iacgenie realm
+  ansible.builtin.uri:
+    url: "{{ keycloak_admin_url | default('https://auth.iacgenie.com') }}/admin/realms"
+    method: POST
+    headers:
+      Authorization: "Bearer {{ keycloak_admin_token }}"
+      Content-Type: application/json
+    body_format: json
+    body: "{{ keycloak_realm_config }}"
+    status_code: [201]
+  when: kc_realm_check.status == 404
+  register: kc_create_realm
+  changed_when: true
+
+- name: Get realm ID after creation
+  ansible.builtin.set_fact:
+    keycloak_realm_id: "{{ keycloak_realm_config.id }}"
+  when: kc_create_realm is changed
+
+- name: Create realm roles
+  ansible.builtin.uri:
+    url: "{{ keycloak_admin_url | default('https://auth.iacgenie.com') }}/admin/realms/iacgenie/roles"
+    method: POST
+    headers:
+      Authorization: "Bearer {{ keycloak_admin_token }}"
+      Content-Type: application/json
+    body_format: json
+    body: "{{ item }}"
+    status_code: [201]
+  loop: "{{ keycloak_realm_roles }}"
+  loop_control:
+    label: "{{ item.name }}"
+  changed_when: true
+  when: keycloak_realm_id is defined or kc_create_realm is changed
+
+- name: Create client scopes
+  ansible.builtin.uri:
+    url: "{{ keycloak_admin_url | default('https://auth.iacgenie.com') }}/admin/realms/iacgenie/client-scopes"
+    method: POST
+    headers:
+      Authorization: "Bearer {{ keycloak_admin_token }}"
+      Content-Type: application/json
+    body_format: json
+    body: "{{ item }}"
+    status_code: [201]
+  loop: "{{ keycloak_client_scopes }}"
+  loop_control:
+    label: "{{ item.name }}"
+  changed_when: true
+  when: keycloak_realm_id is defined or kc_create_realm is changed
+
+- name: Create Keycloak clients
+  ansible.builtin.uri:
+    url: "{{ keycloak_admin_url | default('https://auth.iacgenie.com') }}/admin/realms/iacgenie/clients"
+    method: POST
+    headers:
+      Authorization: "Bearer {{ keycloak_admin_token }}"
+      Content-Type: application/json
+    body_format: json
+    body: "{{ item }}"
+    status_code: [201]
+  loop: "{{ keycloak_clients }}"
+  loop_control:
+    label: "{{ item.client_id }}"
+  register: kc_clients_created
+  changed_when: true
+  when: keycloak_realm_id is defined or kc_create_realm is changed
+
+- name: Save client secrets
+  ansible.builtin.copy:
+    content: "{{ item.client_id }}: {{ item.secret | default('N/A') }}\n"
+    dest: "/tmp/keycloak-client-secrets.txt"
+    mode: "0600"
+    create: true
+  loop: "{{ keycloak_clients }}"
+  loop_control:
+    label: "{{ item.client_id }}"
+  when:
+    - keycloak_realm_id is defined or kc_create_realm is changed
+    - item.client_secret is defined
+  changed_when: false
+
+- name: Display client secrets summary
+  ansible.builtin.debug:
+    msg: "Client secrets saved to /tmp/keycloak-client-secrets.txt (chmod 0600)"
+  when: keycloak_realm_id is defined or kc_create_realm is changed

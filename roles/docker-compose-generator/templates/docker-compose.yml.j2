@@ -19,7 +19,7 @@ services:
     ports:
       - "127.0.0.1:5432:5432"
     networks:
-      - "{{ docker_network_name | default('iacgenie-network') }}"
+      - iacgenie-backend
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U lightsrp -d lightsrp"]
       interval: 30s
@@ -43,7 +43,7 @@ services:
     ports:
       - "127.0.0.1:6379:6379"
     networks:
-      - "{{ docker_network_name | default('iacgenie-network') }}"
+      - iacgenie-backend
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 30s
@@ -69,9 +69,8 @@ services:
       - /home/mkanavi/docker/iacgenie/data/minio:/data
     ports:
       - "127.0.0.1:9000:9000"
-      - "127.0.0.1:9001:9001"
     networks:
-      - "{{ docker_network_name | default('iacgenie-network') }}"
+      - iacgenie-backend
     healthcheck:
       test: ["CMD", "mc", "ready", "local"]
       interval: 30s
@@ -81,6 +80,20 @@ services:
       resources:
         limits:
           memory: "{{ service_memory_defaults.minio }}"
+
+  # MinIO Console — proxied via Nginx with auth for admin access only
+  minio-console:
+    image: nginx:1.27-alpine
+    container_name: iacgenie_minio_console_proxy
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:9001:9001"
+    networks:
+      - iacgenie-frontend
+    depends_on:
+      - minio
+    volumes:
+      - ./minio-nginx.conf:/etc/nginx/conf.d/default.conf:ro
 
   # =====================
   # OpenBao 2.6.0
@@ -106,7 +119,7 @@ services:
       - "127.0.0.1:8200:8200"
       - "127.0.0.1:8201:8201"
     networks:
-      - "{{ docker_network_name | default('iacgenie-network') }}"
+      - iacgenie-backend
     healthcheck:
       test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1:8200/v1/sys/health 2>&1"]
       interval: 30s
@@ -124,18 +137,32 @@ services:
     image: quay.io/keycloak/keycloak:26.0
     container_name: iacgenie_keycloak
     restart: unless-stopped
-    command: start --http-enabled=true --http-port=8080 --db-url-host=postgres --db-url-port=5432 --db-url-database=keycloak --db-username=keycloak --db-password="${KC_DB_PASSWORD}" --hostname=https://auth.iacgenie.com --hostname-admin=https://auth.iacgenie.com
+    command:
+      - start
+      - --http-enabled=true
+      - --http-port=8080
+      - --db-url-host=postgres
+      - --db-url-port=5432
+      - --db-url-database=keycloak
+      - --db-username=keycloak
+      - --db-password=${KC_DB_PASSWORD}
+      - --hostname=https://auth.iacgenie.com
+      - --hostname-admin=https://auth.iacgenie.com
     environment:
       KC_BOOTSTRAP_ADMIN_USERNAME: "${KEYCLOAK_ADMIN_USER}"
       KC_BOOTSTRAP_ADMIN_PASSWORD: "${KEYCLOAK_ADMIN_PASSWORD}"
       KEYCLOAK_ADMIN: "${KEYCLOAK_ADMIN_USER}"
       KEYCLOAK_ADMIN_PASSWORD: "${KEYCLOAK_ADMIN_PASSWORD}"
+      KC_DB_PASSWORD: "${KC_DB_PASSWORD}"
+      KC_DB_HOST: "${KC_DB_HOST}"
+      KC_DB_PORT: "${KC_DB_PORT}"
+      KC_DB_NAME: "${KC_DB_NAME}"
     volumes:
       - /home/mkanavi/docker/iacgenie/data/keycloak:/opt/keycloak/data
     ports:
       - "127.0.0.1:8083:8080"
     networks:
-      - "{{ docker_network_name | default('iacgenie-network') }}"
+      - iacgenie-backend
     depends_on:
       - postgres
     healthcheck:
@@ -163,15 +190,21 @@ services:
       GITEA__database__USER: gitea
       GITEA__database__PASSWORD: "${GITEA_DB_PASSWORD}"
       GITEA__security__INSTALL_LOCK: "true"
-      GITEA__service__DISABLE_REGISTRATION: "false"
+      GITEA__security__DISABLE_REGISTRATION: "{{ gitea_disable_registration | default('true') }}"
+      GITEA__service__DISABLE_REGISTRATION: "{{ gitea_disable_registration | default('true') }}"
       GITEA__service__REGISTER_EMAIL_CONFIRM: "false"
-      GITEA__service__ENABLE_NOTIFY_MAIL: "true"
-      GITEA__mailer__ENABLED: "true"
-      GITEA__mailer__SMTP_ADDR: "${SMTP_ADDR}"
-      GITEA__mailer__SMTP_PORT: "${SMTP_PORT}"
-      GITEA__mailer__USER: "${SMTP_USER}"
-      GITEA__mailer__PASSWD: "${SMTP_PASS}"
-      GITEA__mailer__FROM: "${SMTP_FROM}"
+      GITEA__service__ENABLE_NOTIFY_MAIL: "{{ gitea_enable_notify_mail | default('true') }}"
+      GITEA__mailer__ENABLED: "{{ gitea_enable_notify_mail | default('true') }}"
+      GITEA__mailer__SMTP_ADDR: "{{ smtp_addr | default('mail.smtp2go.com') }}"
+      GITEA__mailer__SMTP_PORT: "{{ smtp_port | default('2525') }}"
+      GITEA__mailer__USER: "{{ smtp_user | default('CHANGE_ME_IN_VAULT') }}"
+      GITEA__mailer__PASSWD: "{{ smtp_pass | default('CHANGE_ME_IN_VAULT') }}"
+      GITEA__mailer__FROM: "{{ smtp_from | default('noreply@iacgenie.com') }}"
+      GITEA__security__DISABLE_GRAVATAR: "true"
+      GITEA__security__ENABLE_CAPTCHA: "true"
+      GITEA__session__SESSION_LIFETIME: 86400
+      GITEA__session__COOKIE_SECURE: "true"
+      GITEA__security__MIN_PASSWORD_LENGTH: 12
     volumes:
       - /home/mkanavi/docker/iacgenie/data/gitea:/var/lib/gitea
       - /home/mkanavi/docker/iacgenie/data/gitea:/etc/gitea
@@ -179,7 +212,7 @@ services:
       - "127.0.0.1:3000:3000"
       - "127.0.0.1:2222:2222"
     networks:
-      - "{{ docker_network_name | default('iacgenie-network') }}"
+      - iacgenie-backend
     depends_on:
       - postgres
     healthcheck:
@@ -209,12 +242,16 @@ services:
       SEARXNG_URL: "http://searxng:8080"
       LIGHTSERP_S3_BASE: "iacgenie-lightserp"
       LIGHTSERP_ALLOW_INSECURE: "true"
-      REDIS_URL: "redis://redis:6379"
-      DATABASE_URL: "postgresql://lightsrp:${PG_ROOT_PASSWORD}@postgres:5432/lightsrp"
+      REDIS_URL: "redis://:${REDIS_PASSWORD}@redis:6379/0"
+      LIGHTSERP_API_SECRET: "${LIGHTSERP_API_SECRET}"
+      LIGHTSERP_DATABASE_URL: "${LIGHTSERP_DATABASE_URL}"
+      LIGHTSERP_KEYCLOAK_CLIENT_SECRET: "${LIGHTSERP_KEYCLOAK_CLIENT_SECRET}"
     ports:
       - "127.0.0.1:8000:3000"
     networks:
-      - "{{ docker_network_name | default('iacgenie-network') }}"
+      - iacgenie-frontend
+      - iacgenie-backend
+      - iacgenie-messaging
     depends_on:
       - postgres
       - minio
@@ -235,7 +272,7 @@ services:
     ports:
       - "127.0.0.1:3001:3070"
     networks:
-      - "{{ docker_network_name | default('iacgenie-network') }}"
+      - iacgenie-frontend
     depends_on:
       - lightserp-api
     deploy:
@@ -256,7 +293,7 @@ services:
     ports:
       - "127.0.0.1:8082:8080"
     networks:
-      - "{{ docker_network_name | default('iacgenie-network') }}"
+      - iacgenie-frontend
     healthcheck:
       test: ["CMD", "wget", "--spider", "-q", "http://127.0.0.1:8080/"]
       interval: 30s
@@ -281,7 +318,7 @@ services:
       - "127.0.0.1:4150:4150"
       - "127.0.0.1:4151:4151"
     networks:
-      - "{{ docker_network_name | default('iacgenie-network') }}"
+      - iacgenie-messaging
     healthcheck:
       test: ["CMD-SHELL", "exec 6<>/dev/tcp/127.0.0.1/4150 && exec 6>&-"]
       interval: 30s
@@ -305,7 +342,7 @@ services:
     ports:
       - "127.0.0.1:8081:8082"
     networks:
-      - "{{ docker_network_name | default('iacgenie-network') }}"
+      - iacgenie-frontend
     depends_on:
       - lightserp-api
     deploy:
@@ -313,7 +350,16 @@ services:
         limits:
           memory: "{{ service_memory_defaults.pagezen }}"
 
-# Networks
+# =====================
+# Docker Network Segmentation (Phase 10.7)
+# =====================
 networks:
-  "{{ docker_network_name | default('iacgenie-network') }}":
-    external: true
+  # Frontend: nginx-exposed services
+  iacgenie-frontend:
+    driver: bridge
+  # Backend: database, cache, object storage, auth
+  iacgenie-backend:
+    driver: bridge
+  # Messaging: pub/sub services
+  iacgenie-messaging:
+    driver: bridge

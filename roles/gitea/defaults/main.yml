@@ -7,3 +7,18 @@ gitea_admin_email: admin@iacgenie.com
 gitea_db_host: 127.0.0.1
 gitea_db_port: 5432
 gitea_db_name: gitea
+# Security hardening (Phase 10.9)
+gitea_disable_registration: true
+gitea_enable_notify_mail: true
+gitea_min_password_length: 12
+# SMTP config
+smtp_addr: mail.smtp2go.com
+smtp_port: "2525"
+smtp_user: CHANGE_ME_IN_VAULT
+smtp_pass: CHANGE_ME_IN_VAULT
+smtp_from: noreply@iacgenie.com
+# Keycloak vars
+keycloak_db_password: CHANGE_ME_IN_VAULT
+keycloak_db_host: 127.0.0.1
+keycloak_db_port: 5432
+keycloak_db_name: keycloak

@@ -1,0 +1,84 @@
+---
+# Keycloak realm configuration
+keycloak_realm_config:
+  id: iacgenie
+  realm: iacgenie
+  displayName: IacGenie Platform
+  enabled: true
+  registrationAllowed: false
+  BruteForceProtected: true
+  permanentLockout: false
+  bruteForceProtectDuration: 300
+  loginLifespan: 3600
+  accessCodeLifespan: 900
+  accessCodeLifespanUserAction: 900
+  sslRequired: external
+  passwordPolicy: "length(12) and notUsername and specialCharacters"
+
+# Realm roles
+keycloak_realm_roles:
+  - name: platform-admin
+    description: Full access to all platforms and projects
+    composite: false
+  - name: project-admin
+    description: Manage own project members and resources
+    composite: false
+  - name: project-member
+    description: Read-only access to own project
+
+# Client scopes
+keycloak_client_scopes:
+  - name: project-scope
+    description: Project membership claims
+    protocol: openid-connect
+    includeInTokenScope: true
+  - name: roles-scope
+    description: User roles and permissions
+    protocol: openid-connect
+    includeInTokenScope: true
+
+# Clients to create
+keycloak_clients:
+  - client_id: iacgenie-platform
+    name: IacGenie Admin Dashboard
+    enabled: true
+    client_type: CONFIDENTIAL
+    redirect_uris:
+      - "https://app.iacgenie.com/*"
+    web_origins:
+      - "https://app.iacgenie.com"
+    standardFlowEnabled: true
+    directAccessGrantsEnabled: false
+    serviceAccountsEnabled: false
+    authorizationServicesEnabled: true
+    secret: "{{ keycloak_client_iacgenie_secret | default('CHANGE_ME_IN_VAULT') }}"
+  - client_id: lightserp-api
+    name: LightSerp API Client
+    enabled: true
+    client_type: CONFIDENTIAL
+    redirect_uris:
+      - "http://127.0.0.1:8000/*"
+    standardFlowEnabled: true
+    directAccessGrantsEnabled: true
+    serviceAccountsEnabled: false
+    secret: "{{ keycloak_client_lightserp_secret | default('CHANGE_ME_IN_VAULT') }}"
+  - client_id: gitea
+    name: Gitea SSO Client
+    enabled: true
+    client_type: CONFIDENTIAL
+    redirect_uris:
+      - "https://git.iacgenie.com/*"
+    standardFlowEnabled: true
+    directAccessGrantsEnabled: false
+    serviceAccountsEnabled: false
+    secret: "{{ keycloak_client_gitea_secret | default('CHANGE_ME_IN_VAULT') }}"
+  - client_id: searxng
+    name: SearXNG Search Client
+    enabled: true
+    client_type: CONFIDENTIAL
+    redirect_uris:
+      - "http://search.iacgenie.com/*"
+    standardFlowEnabled: true
+    directAccessGrantsEnabled: false
+    serviceAccountsEnabled: false
+    secret: "{{ keycloak_client_searxng_secret | default('CHANGE_ME_IN_VAULT') }}"
