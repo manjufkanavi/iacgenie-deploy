@@ -16,6 +16,7 @@
     - role: nsqd
     - role: pagezen
     - role: docker-compose-generator
+    - role: docker-compose-service
     - role: nginx
     - role: cloudflare_tunnel
 

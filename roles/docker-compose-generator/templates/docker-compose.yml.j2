@@ -108,7 +108,7 @@ services:
     networks:
       - "{{ docker_network_name | default('iacgenie-network') }}"
     healthcheck:
-      test: ["CMD-SHELL", "curl -k -sf http://127.0.0.1:8200/v1/sys/health | python3 -c 'import sys,json; d=json.load(sys.stdin); assert d[\"sealed\"]==False or d[\"initialized\"]==True'"]
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1:8200/v1/sys/health 2>&1"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -139,7 +139,7 @@ services:
     depends_on:
       - postgres
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://127.0.0.1:8080/health || exit 1"]
+      test: ["CMD-SHELL", "exec 6<>/dev/tcp/127.0.0.1/8080 && exec 6>&-"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -279,7 +279,7 @@ services:
     networks:
       - "{{ docker_network_name | default('iacgenie-network') }}"
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://127.0.0.1:4151/ping || exit 1"]
+      test: ["CMD-SHELL", "wget -q -O- http://127.0.0.1:4151/ping 2>/dev/null | grep -q ping || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 3
